@@ -1,0 +1,12 @@
+0.1.2 (16-04-2008)
+=====
+* Add header detection to configure
+* Install .cmx file
+
+0.1.1 (17-12-2007)
+=====
+* Safer file opening
+
+0.1.0 (08-11-2007)
+=====
+* Initial release

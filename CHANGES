@@ -5,6 +5,8 @@
   variable for linking against libraries
   located in other places than then standard
   ones.
+* Added prefix to main compilation variables
+  if passed to configure.
 * Added NO_CUSTOM to build
   in standard mode.
 

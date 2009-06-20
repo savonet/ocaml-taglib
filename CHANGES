@@ -1,4 +1,4 @@
-0.1.3 ()
+0.1.3 (20-06-2009)
 =====
 * Added support for --enable-debugging configure option
 * Fixed Makefile for BSD: call $(MAKE) for generating documentation.
@@ -10,6 +10,7 @@
   if passed to configure.
 * Added NO_CUSTOM to build
   in standard mode.
+* Create file is now done in blocking section.
 
 0.1.2 (16-04-2008)
 =====

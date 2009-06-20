@@ -45,6 +45,7 @@
 #include <caml/callback.h>
 #include <caml/fail.h>
 #include <caml/memory.h>
+#include <caml/signals.h>
 
 CAMLprim value caml_taglib_init()
 {
@@ -90,7 +91,16 @@ CAMLprim value caml_taglib_priv_value_int(value name)
 CAMLprim value caml_taglib_file_new(value name)
 {
   CAMLparam1(name);
-  TagLib_File *f = taglib_file_new((const char *)String_val(name)) ;
+
+  int len = caml_string_length(name);
+  char *filename = malloc(len);
+  memcpy(filename, String_val(name), len);
+
+  caml_enter_blocking_section();
+  TagLib_File *f = taglib_file_new(filename) ;
+  caml_leave_blocking_section();
+
+  free(filename);
 
   if (f == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
@@ -101,7 +111,17 @@ CAMLprim value caml_taglib_file_new(value name)
 CAMLprim value caml_taglib_file_new_type(value name, value type)
 {
   CAMLparam2(name,type);
-  TagLib_File *f = taglib_file_new_type((const char *)String_val(name),Int_val(type)) ;
+
+  int len = caml_string_length(name);
+  char *filename = malloc(len);
+  memcpy(filename, String_val(name), len);
+
+  caml_enter_blocking_section();
+  TagLib_File *f =
+    taglib_file_new_type((const char *)String_val(name),Int_val(type)) ;
+  caml_leave_blocking_section();
+
+  free(filename);
 
   if (f == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));

@@ -104,15 +104,7 @@ CAMLprim value caml_taglib_file_new(value name)
 {
   CAMLparam1(name);
 
-  int len = caml_string_length(name);
-  char *filename = malloc(len);
-  memcpy(filename, String_val(name), len);
-
-  caml_enter_blocking_section();
-  TagLib_File *f = taglib_file_new(filename) ;
-  caml_leave_blocking_section();
-
-  free(filename);
+  TagLib_File *f = taglib_file_new(String_val(name)) ;
 
   if (f == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
@@ -124,16 +116,8 @@ CAMLprim value caml_taglib_file_new_type(value name, value type)
 {
   CAMLparam2(name,type);
 
-  int len = caml_string_length(name);
-  char *filename = malloc(len);
-  memcpy(filename, String_val(name), len);
-
-  caml_enter_blocking_section();
   TagLib_File *f =
-    taglib_file_new_type((const char *)String_val(name),Int_val(type)) ;
-  caml_leave_blocking_section();
-
-  free(filename);
+    taglib_file_new_type(String_val(name),Int_val(type)) ;
 
   if (f == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));

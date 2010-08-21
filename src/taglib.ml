@@ -49,7 +49,13 @@ type file_type =
   Mpeg | 
   OggVorbis | 
   Flac |
-  Mpc
+  Mpc |
+  OggFlac |
+  WavPack |
+  Speex |
+  TrueAudio |
+  Mp4 |
+  Asf
 
 exception Closed
 
@@ -68,6 +74,12 @@ let int_of_type m =
     | OggVorbis -> f "File_OggVorbis"
     | Flac -> f "File_FLAC"
     | Mpc -> f "File_MPC"
+    | OggFlac -> f "File_OggFlac"
+    | WavPack -> f "File_WavPack"
+    | Speex -> f "File_Speex"
+    | TrueAudio -> f "File_TrueAudio"
+    | Mp4 -> f "File_MP4"
+    | Asf -> f "File_ASF"
 
 let open_file ?file_type name = 
   (* Test wether file exist to avoid library issue.

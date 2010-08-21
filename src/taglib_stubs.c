@@ -78,6 +78,18 @@ CAMLprim value caml_taglib_priv_value_int(value name)
       CAMLreturn(Val_int(TagLib_File_FLAC)) ;
     if (!strcmp(s,"File_MPC"))
       CAMLreturn(Val_int(TagLib_File_MPC)) ;
+    if (!strcmp(s,"File_OggFlac"))
+      CAMLreturn(Val_int(TagLib_File_OggFlac)) ;
+    if (!strcmp(s,"File_WavPack"))
+      CAMLreturn(Val_int(TagLib_File_WavPack)) ;
+    if (!strcmp(s,"File_Speex"))
+      CAMLreturn(Val_int(TagLib_File_Speex)) ;
+    if (!strcmp(s,"File_TrueAudio"))
+      CAMLreturn(Val_int(TagLib_File_TrueAudio)) ;
+    if (!strcmp(s,"File_MP4"))
+      CAMLreturn(Val_int(TagLib_File_MP4)) ;
+    if (!strcmp(s,"File_ASF"))
+      CAMLreturn(Val_int(TagLib_File_ASF)) ;
 
   caml_failwith("Invalid value");
 }
@@ -151,7 +163,7 @@ CAMLprim value caml_taglib_file_tag(value f)
 CAMLprim value caml_taglib_file_audioproperties(value f)
 {
   CAMLparam1(f);
-  TagLib_AudioProperties *p = taglib_file_audioproperties(Taglib_file_val(f)) ;
+  const TagLib_AudioProperties *p = taglib_file_audioproperties(Taglib_file_val(f)) ;
 
   if (p == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));

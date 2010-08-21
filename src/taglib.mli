@@ -47,7 +47,13 @@ type file_type =
   Mpeg | 
   OggVorbis | 
   Flac |
-  Mpc
+  Mpc  |
+  OggFlac |
+  WavPack |
+  Speex |
+  TrueAudio |
+  Mp4 |
+  Asf 
 
 (** Raised when using a file that has been closed *)
 exception Closed

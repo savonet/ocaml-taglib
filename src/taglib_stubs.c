@@ -78,6 +78,7 @@ CAMLprim value caml_taglib_priv_value_int(value name)
       CAMLreturn(Val_int(TagLib_File_FLAC)) ;
     if (!strcmp(s,"File_MPC"))
       CAMLreturn(Val_int(TagLib_File_MPC)) ;
+#ifdef TAGLIB_1_6
     if (!strcmp(s,"File_OggFlac"))
       CAMLreturn(Val_int(TagLib_File_OggFlac)) ;
     if (!strcmp(s,"File_WavPack"))
@@ -90,8 +91,9 @@ CAMLprim value caml_taglib_priv_value_int(value name)
       CAMLreturn(Val_int(TagLib_File_MP4)) ;
     if (!strcmp(s,"File_ASF"))
       CAMLreturn(Val_int(TagLib_File_ASF)) ;
+#endif
 
-  caml_failwith("Invalid value");
+  caml_raise_constant(*caml_named_value("taglib_exn_not_implemented"));
 }
 
 #define Taglib_file_val(v) ((TagLib_File *)v)

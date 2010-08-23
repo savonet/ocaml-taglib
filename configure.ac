@@ -122,6 +122,12 @@ AC_SUBST([taglib_LIBS])
 taglib_LDFLAGS=`$PKG_CONFIG --libs-only-L taglib_c`
 AC_SUBST([taglib_LDFLAGS])
 
+# Check that we are compiling against version 
+# greater than 1.6
+if $PKG_CONFIG --atleast-version=1.6 taglib_c; then
+  CFLAGS="$CFLAGS -DTAGLIB_1_6"
+fi
+
 if test "$OCAMLOPT" = no ; then
     BEST=byte
 else

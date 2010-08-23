@@ -34,17 +34,20 @@
 
 (* @author Romain Beauxis *)
 
+exception Not_implemented
+
 (** Perform this *FIRST* *)
 external init : unit -> unit = "caml_taglib_init"
 let () = 
   Callback.register_exception "taglib_exn_not_found" Not_found ;
+  Callback.register_exception "taglib_exn_not_implemented" Not_implemented ;
   init () ;
 
 
 type _file
 type tag
 type audioproperties
-type file = ((_file option)*(tag option)*(audioproperties option)) ref
+type t = ((_file option)*(tag option)*(audioproperties option)) ref
 type file_type = 
   Mpeg | 
   OggVorbis | 
@@ -56,6 +59,10 @@ type file_type =
   TrueAudio |
   Mp4 |
   Asf
+(** Supported types. Warning, types: [OggFlac],
+  * [WavPack], [Speex], [TrueAudio], [Mp4], [Asf]
+  * only supported with taglib version 1.6 or greater. *) 
+
 
 exception Closed
 

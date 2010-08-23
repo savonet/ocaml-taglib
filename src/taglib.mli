@@ -42,7 +42,11 @@
 
 (** {1 Types } *)
 
-type file
+type t
+
+(** Supported file types. Warning, types: [OggFlac],
+  * [WavPack], [Speex], [TrueAudio], [Mp4], [Asf]
+  * only supported with taglib version 1.6 or greater. *)
 type file_type = 
   Mpeg | 
   OggVorbis | 
@@ -58,6 +62,10 @@ type file_type =
 (** Raised when using a file that has been closed *)
 exception Closed
 
+(** Raised when using a file format not supported by 
+  * the system's taglib library. *)
+exception Not_implemented
+
 (** {1 Functions } *)
 
 (** {2 Settings } *)
@@ -71,53 +79,56 @@ val set_strings_unicode : bool -> unit
 
 (** Open a file. 
   
-   Raises [Not_found] if file does not exist or could not be opened. *)
-val open_file : ?file_type:file_type -> string -> file
+   Raises [Not_found] if file does not exist or could not be opened. 
 
-val close_file : file -> unit
+   Raises [Not_implemented] if using a [file_type] that is not implemented
+   in the system's taglib library. *)
+val open_file : ?file_type:file_type -> string -> t
 
-val file_save : file -> bool
+val close_file : t -> unit
+
+val file_save : t -> bool
 
 (** {2 Get tag interface } *)
 
-val tag_title : file -> string
+val tag_title : t -> string
 
-val tag_artist : file -> string
+val tag_artist : t -> string
 
-val tag_album : file -> string
+val tag_album : t -> string
 
-val tag_comment : file -> string
+val tag_comment : t -> string
 
-val tag_genre : file -> string
+val tag_genre : t -> string
 
-val tag_year : file -> int
+val tag_year : t -> int
 
-val tag_track : file -> int
+val tag_track : t -> int
 
 (** {2 Set tag interface } *)
 
-val tag_set_title : file -> string -> unit
+val tag_set_title : t -> string -> unit
 
-val tag_set_artist : file -> string -> unit
+val tag_set_artist : t -> string -> unit
 
-val tag_set_album : file -> string -> unit
+val tag_set_album : t -> string -> unit
 
-val tag_set_comment : file -> string -> unit
+val tag_set_comment : t -> string -> unit
 
-val tag_set_genre : file -> string -> unit
+val tag_set_genre : t -> string -> unit
 
-val tag_set_year : file -> int -> unit
+val tag_set_year : t -> int -> unit
 
-val tag_set_track : file -> int -> unit
+val tag_set_track : t -> int -> unit
 
 (** {2 Get audio properties interface } *)
 
-val audioproperties_length : file -> int
+val audioproperties_length : t -> int
 
-val audioproperties_bitrate : file -> int
+val audioproperties_bitrate : t -> int
 
-val audioproperties_samplerate : file -> int
+val audioproperties_samplerate : t -> int
 
-val audioproperties_channels : file -> int
+val audioproperties_channels : t -> int
 
 

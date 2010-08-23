@@ -23,7 +23,7 @@ DVIPS = @DVIPS@
 PS2PDF = @PS2PDF@
 OCAMLLIBPATH = @CAMLLIBPATH@
 
-SOURCES = taglib_stubs.c taglib.ml taglib.mli
+SOURCES = taglib_version.cc taglib_stubs.c taglib.ml taglib.mli
 RESULT = taglib
 OCAMLDOCFLAGS = -stars
 LIBINSTALL_FILES = $(wildcard *.mli *.cmi *.cma *.cmxa *.cmx *.a *.so)
@@ -32,6 +32,7 @@ LDFLAGS = @LDFLAGS@ @taglib_LDFLAGS@
 CLIBS = $(ACLIBS:-l%=%)
 LIBDIRS = $(LDFLAGS:-L%=%)
 CC = @CC@
+CXX = @CXX@
 CFLAGS = @CFLAGS@ @taglib_CFLAGS@ -Wall -DCAML_NAME_SPACE
 CPPFLAGS = @CPPFLAGS@
 INCDIRS = @INC@

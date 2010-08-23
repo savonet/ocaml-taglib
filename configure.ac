@@ -108,6 +108,7 @@ fi
 CAMLLIBPATH=`$OCAMLC -where`
 
 AC_PROG_CC()
+AC_PROG_CXX()
 PKG_PROG_PKG_CONFIG()
 #PKG_CHECK_MODULES(taglib, taglib_c, , [AC_MSG_ERROR(taglib not found.)])
 
@@ -122,11 +123,7 @@ AC_SUBST([taglib_LIBS])
 taglib_LDFLAGS=`$PKG_CONFIG --libs-only-L taglib_c`
 AC_SUBST([taglib_LDFLAGS])
 
-# Check that we are compiling against version 
-# greater than 1.6
-if $PKG_CONFIG --atleast-version=1.6 taglib_c; then
-  CFLAGS="$CFLAGS -DTAGLIB_1_6"
-fi
+CPPFLAGS="$CPPFLAGS -fPIC"
 
 if test "$OCAMLOPT" = no ; then
     BEST=byte

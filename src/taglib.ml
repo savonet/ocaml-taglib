@@ -1,5 +1,5 @@
 (*
- * Copyright 2007 Romain Beauxis
+ * Copyright 2007-2010 Romain Beauxis
  *
  * This file is part of ocaml-taglib.
  *
@@ -59,12 +59,12 @@ type file_type =
   TrueAudio |
   Mp4 |
   Asf
-(** Supported types. Warning, types: [OggFlac],
-  * [WavPack], [Speex], [TrueAudio], [Mp4], [Asf]
-  * only supported with taglib version 1.6 or greater. *) 
-
 
 exception Closed
+
+external version : unit -> string = "caml_taglib_version"
+
+let version = version ()
 
 external set_strings_unicode : bool -> unit = "caml_taglib_set_strings_unicode"
 

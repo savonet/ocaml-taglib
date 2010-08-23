@@ -1,5 +1,5 @@
 (*
- * Copyright 2007 Romain Beauxis
+ * Copyright 2007-2010 Romain Beauxis
  *
  * This file is part of ocaml-taglib.
  *
@@ -44,9 +44,11 @@
 
 type t
 
-(** Supported file types. Warning, types: [OggFlac],
-  * [WavPack], [Speex], [TrueAudio], [Mp4], [Asf]
-  * only supported with taglib version 1.6 or greater. *)
+(** Supported file types. Warning, types: [WavPack], 
+  * [Speex] and [TrueAudio] are only supported in 
+  * Taglib >= 1.5. 
+  * Types: [Mp4], [Asf] are only supported with 
+  * Taglib >= 1.6. *)
 type file_type = 
   Mpeg | 
   OggVorbis | 
@@ -58,6 +60,9 @@ type file_type =
   TrueAudio |
   Mp4 |
   Asf 
+
+(** Library's version. *)
+val version : string
 
 (** Raised when using a file that has been closed *)
 exception Closed

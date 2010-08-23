@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Romain Beauxis
+ * Copyright 2007-2010 Romain Beauxis
  *
  * This file is part of ocaml-taglib.
  *
@@ -78,17 +78,25 @@ CAMLprim value caml_taglib_priv_value_int(value name)
       CAMLreturn(Val_int(TagLib_File_FLAC)) ;
     if (!strcmp(s,"File_MPC"))
       CAMLreturn(Val_int(TagLib_File_MPC)) ;
-#ifdef TAGLIB_1_6
     if (!strcmp(s,"File_OggFlac"))
       CAMLreturn(Val_int(TagLib_File_OggFlac)) ;
+#ifdef TagLib_File_WavPack
     if (!strcmp(s,"File_WavPack"))
       CAMLreturn(Val_int(TagLib_File_WavPack)) ;
+#endif
+#ifdef TagLib_File_Speex
     if (!strcmp(s,"File_Speex"))
       CAMLreturn(Val_int(TagLib_File_Speex)) ;
+#endif
+#ifdef TagLib_File_TrueAudio
     if (!strcmp(s,"File_TrueAudio"))
       CAMLreturn(Val_int(TagLib_File_TrueAudio)) ;
+#endif
+#ifdef TagLib_File_MP4
     if (!strcmp(s,"File_MP4"))
       CAMLreturn(Val_int(TagLib_File_MP4)) ;
+#endif
+#ifdef TagLib_File_ASF
     if (!strcmp(s,"File_ASF"))
       CAMLreturn(Val_int(TagLib_File_ASF)) ;
 #endif

@@ -18,6 +18,7 @@ AC_CHECK_OCAML_COMPILERS()
 AC_PROG_CC()
 AC_PROG_CXX()
 AC_CHECK_TOOL([AR],[ar],no)
+AC_SUBST(AR)
 PKG_PROG_PKG_CONFIG()
 #PKG_CHECK_MODULES(taglib, taglib_c, , [AC_MSG_ERROR(taglib not found.)])
 

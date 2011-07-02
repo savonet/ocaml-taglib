@@ -1,4 +1,4 @@
-0.1.4 ()
+0.1.4 (02-07-2011)
 =====
 * Reworked build system, now using pkg-config.
 * Added new file formats. Raises Not_implemented

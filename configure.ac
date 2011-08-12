@@ -28,7 +28,7 @@ if ! $PKG_CONFIG --exists taglib_c; then
 fi
 taglib_CFLAGS=`$PKG_CONFIG --cflags taglib_c`
 AC_SUBST([taglib_CFLAGS])
-taglib_LIBS=`$PKG_CONFIG --libs-only-l taglib_c`
+taglib_LIBS="`$PKG_CONFIG --libs-only-l taglib_c` -lstdc++"
 AC_SUBST([taglib_LIBS])
 taglib_LDFLAGS=`$PKG_CONFIG --libs-only-L taglib_c`
 AC_SUBST([taglib_LDFLAGS])

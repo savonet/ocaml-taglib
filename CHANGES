@@ -1,3 +1,10 @@
+0.2.0 ()
+=====
+* Reworked binding using C++ functions
+* Added Inline module to manipulate binary
+  tags without a corresponding file. Only
+  id2v3 tags are supported for now..
+
 0.1.4 (02-07-2011)
 =====
 * Reworked build system, now using pkg-config.

@@ -1,5 +1,5 @@
 (*
- * Copyright 2007-2010 Romain Beauxis
+ * Copyright 2007-2011 Romain Beauxis
  *
  * This file is part of ocaml-taglib.
  *
@@ -34,193 +34,235 @@
 
 (* @author Romain Beauxis *)
 
-exception Not_implemented
-
-(** Perform this *FIRST* *)
 external init : unit -> unit = "caml_taglib_init"
+
 let () = 
   Callback.register_exception "taglib_exn_not_found" Not_found ;
-  Callback.register_exception "taglib_exn_not_implemented" Not_implemented ;
-  init () ;
+  init ()
 
-
-type _file
 type tag
 type audioproperties
-type t = ((_file option)*(tag option)*(audioproperties option)) ref
-type file_type = 
-  Mpeg | 
-  OggVorbis | 
-  Flac |
-  Mpc |
-  OggFlac |
-  WavPack |
-  Speex |
-  TrueAudio |
-  Mp4 |
-  Asf
-
-exception Closed
+type 'a t = ('a * tag * (audioproperties option)) option ref 
 
 external version : unit -> string = "caml_taglib_version"
 
 let version = version ()
 
-external set_strings_unicode : bool -> unit = "caml_taglib_set_strings_unicode"
+module File = 
+struct
+  type file
+  type file_type =
+    [ `Mpeg |
+      `OggVorbis |
+      `Flac |
+      `Mpc |
+      `OggFlac |
+      `WavPack |
+      `Speex |
+      `TrueAudio |
+      `Mp4 |
+      `Asf ]
 
-external priv_value_int : string -> int = "caml_taglib_priv_value_int"
+  exception Invalid_file
+  exception Closed
+  exception Not_implemented
 
-external _open_file : string -> _file = "caml_taglib_file_new"
+  let _ = 
+    Callback.register_exception "taglib_exn_invalid_file" Invalid_file;
+    Callback.register_exception "taglib_exn_not_implemented" Not_implemented
 
-external _open_file_type : string -> int -> _file = "caml_taglib_file_new_type"
+  external open_file : string -> file = "caml_taglib_file_new"
 
-let int_of_type m = 
-  let f = priv_value_int in
-  match m with
-    | Mpeg -> f "File_MPEG"
-    | OggVorbis -> f "File_OggVorbis"
-    | Flac -> f "File_FLAC"
-    | Mpc -> f "File_MPC"
-    | OggFlac -> f "File_OggFlac"
-    | WavPack -> f "File_WavPack"
-    | Speex -> f "File_Speex"
-    | TrueAudio -> f "File_TrueAudio"
-    | Mp4 -> f "File_MP4"
-    | Asf -> f "File_ASF"
+  external open_file_type : string -> file_type -> file = "caml_taglib_file_new_type"
 
-let open_file ?file_type name = 
-  (* Test wether file exist to avoid library issue.
-     See: http://bugs.debian.org/454732 *)
-  begin
-    try
-      ignore(Unix.stat name)
-    with
-      | _ -> raise Not_found
-  end ;
-  let f = 
-    match file_type with
-      | None -> _open_file name
-      | Some m -> _open_file_type name (int_of_type m)
-  in
-  ref (Some f,None,None)
+  external close_file : file -> unit = "caml_taglib_file_free"
 
-external _close_file : _file -> unit = "caml_taglib_file_free"
+  let close_file d = 
+    match !d with
+      | None -> ()
+      | Some (f,_,_) -> 
+          close_file f ; 
+          d := None
 
-let close_file d = 
-  let (f,_,_) = !d in
-  match f with
-    | None -> ()
-    | Some f -> _close_file f ; d := (None,None,None)
+  external file_tag : file -> tag = "caml_taglib_file_tag"
 
-external file_tag : _file -> tag = "caml_taglib_file_tag"
+  external file_audioproperties : file -> audioproperties = "caml_taglib_file_audioproperties"
 
-external file_audioproperties : _file -> audioproperties = "caml_taglib_file_audioproperties"
+  external file_save : file -> bool = "caml_taglib_file_save"
 
-external _file_save : _file -> bool = "caml_taglib_file_save"
+  let file_save d = 
+    match !d with
+      | None -> raise Closed
+      | Some (f,_,_) -> file_save f
 
-let file_save d = 
-  let (f,_,_) = !d in
-  match f with
-    | None -> raise Closed
-    | Some f -> _file_save f
+  let open_file ?file_type name =
+    (* Test wether file exist to avoid library issue.
+       See: http://bugs.debian.org/454732 *)
+    begin
+      try
+        ignore(Unix.stat name)
+      with
+        | _ -> raise Not_found
+    end ;
+    let f =
+      match file_type with
+        | None -> open_file name
+        | Some m -> open_file_type name m
+    in
+    let tag = file_tag f in
+    let prop = file_audioproperties f in
+    ref (Some (f,tag,Some prop))
 
-let tag_extract d = 
-  let (f,t,p) = !d in
-  match f,t with
-    | None,_ -> raise Closed
-    | Some file,None -> 
-       let tmp = file_tag file in
-       d := (f,Some tmp,p) ;
-       tmp
-    | Some _,Some t -> t
+  external audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
 
-external _tag_get_string : tag -> string -> string = "caml_taglib_tag_get_string"
+  let audioproperties_get_int f s =
+    match !f with
+      | None -> raise Closed;
+      | Some (_,_, None) -> raise Not_implemented
+      | Some (_,_, Some p) -> audioproperties_get_int p s
 
-let tag_get_string d s = 
-  _tag_get_string (tag_extract d) s
+  let audioproperties_length p = audioproperties_get_int p "length"
 
-let tag_title t = 
-  tag_get_string t "title"
+  let audioproperties_bitrate p = audioproperties_get_int p "bitrate"
 
-let tag_artist t = 
-  tag_get_string t "artist"
+  let audioproperties_samplerate p = audioproperties_get_int p "samplerate"
 
-let tag_album t = 
-  tag_get_string t "album"
+  let audioproperties_channels p = audioproperties_get_int p "channels"
+end
 
-let tag_comment t = 
-  tag_get_string t "comment"
+let tag_extract f = 
+  match !f with
+    | None -> raise File.Closed
+    | Some (_,t,_) -> t
 
-let tag_genre t = 
-  tag_get_string t "genre"
+external tag_get_string : tag -> string -> string = "caml_taglib_tag_get_string"
 
-external _tag_get_int : tag -> string -> int = "caml_taglib_tag_get_int"
+let tag_get_string d s = tag_get_string (tag_extract d) s
 
-let tag_get_int d s = 
-  _tag_get_int (tag_extract d) s
+let tag_title t = tag_get_string t "title"
 
-let tag_year t = 
-  tag_get_int t "year"
+let tag_artist t = tag_get_string t "artist"
 
-let tag_track t = 
-  tag_get_int t "track"
+let tag_album t = tag_get_string t "album"
 
-external _tag_set_string : tag -> string -> string -> unit = "caml_taglib_tag_set_string"
+let tag_comment t = tag_get_string t "comment"
 
-let tag_set_string t s v = 
-  _tag_set_string (tag_extract t) s v
+let tag_genre t = tag_get_string t "genre"
 
-let tag_set_title t = 
-  tag_set_string t "title"
+external tag_get_int : tag -> string -> int = "caml_taglib_tag_get_int"
 
-let tag_set_artist t = 
-  tag_set_string t "artist"
+let tag_get_int d s = tag_get_int (tag_extract d) s
 
-let tag_set_album t = 
-  tag_set_string t "album"
+let tag_year t = tag_get_int t "year"
 
-let tag_set_comment t = 
-  tag_set_string t "comment"
+let tag_track t = tag_get_int t "track"
 
-let tag_set_genre t = 
-  tag_set_string t "genre"
+external tag_set_string : tag -> string -> string -> unit = "caml_taglib_tag_set_string"
 
-external _tag_set_int : tag -> string -> int -> unit = "caml_taglib_tag_set_int"
+let tag_set_string t s v = tag_set_string (tag_extract t) s v
 
-let tag_set_int t s v = 
-  _tag_set_int (tag_extract t) s v
+let tag_set_title t = tag_set_string t "title"
 
-let tag_set_year t = 
-  tag_set_int t "year"
+let tag_set_artist t = tag_set_string t "artist"
 
-let tag_set_track t = 
-  tag_set_int t "track"
+let tag_set_album t = tag_set_string t "album"
 
-external _audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
+let tag_set_comment t = tag_set_string t "comment"
 
-let audioproperties_get_int d s = 
-  let (f,t,p) = !d in
-  let p = 
-    match f,p with
-      | None,_ -> raise Closed
-      | Some file,None -> 
-        let tmp = file_audioproperties file in
-        d := (f,t,Some tmp) ;
-        tmp
-      | _,Some p -> p
-  in
-  _audioproperties_get_int p s
+let tag_set_genre t = tag_set_string t "genre"
 
-let audioproperties_length p = 
-  audioproperties_get_int p "length"
+external tag_set_int : tag -> string -> int -> unit = "caml_taglib_tag_set_int"
 
-let audioproperties_bitrate p = 
-  audioproperties_get_int p "bitrate"
+let tag_set_int t s v = tag_set_int (tag_extract t) s v
 
-let audioproperties_samplerate p = 
-  audioproperties_get_int p "samplerate"
+let tag_set_year t = tag_set_int t "year"
 
-let audioproperties_channels p = 
-  audioproperties_get_int p "channels"
+let tag_set_track t = tag_set_int t "track"
 
+module Inline = 
+struct
+  module Id3v2 = 
+  struct
+    type 'a id3v2 = unit 
+    type state = [ `Invalid | `Parsed | `Valid ]
 
+    type frame_type = string
+
+    type frame_text = string
+
+    external init : unit -> tag = "caml_taglib_id3v2_init"
+
+    let init () = 
+      let t = init () in
+      ref (Some ((), t, None))
+
+    external header_size : unit -> int = "caml_taglib_id3v2_header_len"
+
+    let header_size = header_size ()
+
+    let grab_tag t = 
+       match !t with
+         | Some (_, t, _) -> t
+         | _ -> assert false
+
+    external parse_header : tag -> string -> unit = "caml_taglib_id3v2_parse_header"
+
+    external tag_size : tag -> int = "caml_taglib_id3v2_tag_size"
+
+    let tag_size t = tag_size (grab_tag t)
+
+    let parse_header t h =
+      if String.length h < header_size then
+        failwith "header string too short.";
+      parse_header (grab_tag t) h ;
+      if tag_size t <= header_size then
+        failwith "invalid header" ;
+      t
+
+    external parse_tag : tag -> string -> unit = "caml_taglib_id3v2_parse_tag"
+
+    let parse_tag t h = 
+      if String.length h < tag_size t then
+        failwith "tag data too short.";
+      parse_tag (grab_tag t) h ;
+      t
+   
+    external render : tag -> string = "caml_taglib_id3v2_render"
+
+    let render t = render (grab_tag t)
+
+    external attach_frame : tag -> string -> string -> unit = "caml_taglib_id3v2_attach_frame"
+
+    let attach_frame t l c = 
+      attach_frame (grab_tag t) l c;
+      t
+
+    let tag_set_title t s = 
+      tag_set_title t s;
+      t
+
+    let tag_set_artist t s = 
+      tag_set_artist t s;
+      t
+
+    let tag_set_album t s =
+      tag_set_album t s;
+      t
+
+    let tag_set_comment t s =
+      tag_set_comment t s;
+      t
+
+    let tag_set_genre t s = 
+      tag_set_genre t s;
+      t
+
+    let tag_set_year t s = 
+      tag_set_year t s;
+      t
+
+    let tag_set_track t s = 
+      tag_set_track t s;
+      t
+  end
+end

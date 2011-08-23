@@ -1,5 +1,5 @@
 (*
- * Copyright 2007-2010 Romain Beauxis
+ * Copyright 2007-2011 Romain Beauxis
  *
  * This file is part of ocaml-taglib.
  *
@@ -37,103 +37,172 @@
 
 (** This library provides a set/get interface for several audio file format's tags informations.
 
-    Usage is quite simple. All functions using a [file] type variable, except [close_file], 
-    may raise [Closed] if given file was closed. *)
+    All strings used in this module should be UTF8-encoded. *)
 
 (** {1 Types } *)
 
-type t
+type 'a t
 
-(** Supported file types. Warning, types: [WavPack], 
-  * [Speex] and [TrueAudio] are only supported in 
-  * Taglib >= 1.5. 
-  * Types: [Mp4], [Asf] are only supported with 
-  * Taglib >= 1.6. *)
-type file_type = 
-  Mpeg | 
-  OggVorbis | 
-  Flac |
-  Mpc  |
-  OggFlac |
-  WavPack |
-  Speex |
-  TrueAudio |
-  Mp4 |
-  Asf 
+(** {1 Functions } *)
 
 (** Library's version. *)
 val version : string
 
-(** Raised when using a file that has been closed *)
-exception Closed
+(** {2 Generic tag interface } *)
 
-(** Raised when using a file format not supported by 
-  * the system's taglib library. *)
-exception Not_implemented
+val tag_title : 'a t -> string
 
-(** {1 Functions } *)
+val tag_artist : 'a t -> string
 
-(** {2 Settings } *)
+val tag_album : 'a t -> string
 
-(** All strings supplied to the library are supposed to be UTF-8. 
-    Set this to [true] to use strings in latin1 (ISO-8859-1)
-    format *)
-val set_strings_unicode : bool -> unit
+val tag_comment : 'a t -> string
 
-(** {2 File interface } *)
+val tag_genre : 'a t -> string
 
-(** Open a file. 
-  
-   Raises [Not_found] if file does not exist or could not be opened. 
+val tag_year : 'a t -> int
 
-   Raises [Not_implemented] if using a [file_type] that is not implemented
-   in the system's taglib library. *)
-val open_file : ?file_type:file_type -> string -> t
-
-val close_file : t -> unit
-
-val file_save : t -> bool
-
-(** {2 Get tag interface } *)
-
-val tag_title : t -> string
-
-val tag_artist : t -> string
-
-val tag_album : t -> string
-
-val tag_comment : t -> string
-
-val tag_genre : t -> string
-
-val tag_year : t -> int
-
-val tag_track : t -> int
+val tag_track : 'a t -> int
 
 (** {2 Set tag interface } *)
 
-val tag_set_title : t -> string -> unit
+val tag_set_title : 'a t -> string -> unit
 
-val tag_set_artist : t -> string -> unit
+val tag_set_artist : 'a t -> string -> unit
 
-val tag_set_album : t -> string -> unit
+val tag_set_album : 'a t -> string -> unit
 
-val tag_set_comment : t -> string -> unit
+val tag_set_comment : 'a t -> string -> unit
 
-val tag_set_genre : t -> string -> unit
+val tag_set_genre : 'a t -> string -> unit
 
-val tag_set_year : t -> int -> unit
+val tag_set_year : 'a t -> int -> unit
 
-val tag_set_track : t -> int -> unit
+val tag_set_track : 'a t -> int -> unit
 
-(** {2 Get audio properties interface } *)
+(** {2 File interface } *)
 
-val audioproperties_length : t -> int
+module File :
+sig
+  type file
 
-val audioproperties_bitrate : t -> int
+  (** Supported file types. Warning, types: [WavPack],
+    * [Speex] and [TrueAudio] are only supported in
+    * Taglib >= 1.5.
+    * Types: [Mp4], [Asf] are only supported with
+    * Taglib >= 1.6. *)
+  type file_type =
+    [ `Mpeg |
+      `OggVorbis |
+      `Flac |
+      `Mpc |
+      `OggFlac |
+      `WavPack |
+      `Speex |
+      `TrueAudio |
+      `Mp4 |
+      `Asf ]
 
-val audioproperties_samplerate : t -> int
+  (** Raised when using a file that has been closed *)
+  exception Closed
 
-val audioproperties_channels : t -> int
+  (** Raised when using a file format not supported by
+    * the system's taglib library. *)
+  exception Not_implemented
 
+  (** Raised when taglib cannot parse a file. *)
+  exception Invalid_file
 
+  (** Open a file.
+
+     Raises [Not_found] if file does not exist or could not be opened.
+
+     Raises [Invalid_file] if taglib could not parse the file.
+
+     Raises [Not_implemented] if using a [file_type] that is not implemented
+     in the system's taglib library. *)
+  val open_file : ?file_type:file_type -> string -> file t
+
+  val close_file : file t -> unit
+
+  val file_save : file t -> bool
+
+  (** {2 Get audio properties interface } *)
+
+  val audioproperties_length : file t -> int
+
+  val audioproperties_bitrate : file t -> int
+
+  val audioproperties_samplerate : file t -> int
+
+  val audioproperties_channels : file t -> int
+end
+
+(** {2 Inline interface } *)
+
+(** This module provides an API to manipulate tags not
+  * attached to a file. *)
+module Inline :
+sig
+  (** Parse and generate id3v2 binary tags. 
+    *
+    * This module provides ways to manipulate id3v2 tags
+    * not attached to a file. It is quite low-level and,
+    * despite good care in tightening its API, it is possible
+    * to generate invalid id3v2 tags using it. The user is thus
+    * advised to read about the id3v2 standard before using this
+    * module.
+    *
+    * Currently, only attaching text-based frames are supported. 
+    * Reading tag's frames can only be done currently through the
+    * common [tag_title], ... API. *)
+  module Id3v2 : 
+  sig
+    type 'a id3v2
+    (** State of the tag. This is used to enforce validity of 
+      * the generated tag. 
+      * 
+      * A tag is valid iff it has been properly parsed or
+      * at least one frame has been added to it. *)
+    type state = [ `Invalid | `Parsed | `Valid ]
+
+    (** A frame type is the id3v2 identifier, e.g. TIT2, TALB, ... *)
+    type frame_type = string
+
+    (** Text content of a frame. *)
+    type frame_text = string
+
+    val init : unit -> ([> `Invalid] id3v2) t
+
+    val header_size : int
+
+    val parse_header : ([> `Invalid] id3v2) t -> string -> ([> `Parsed] id3v2) t
+
+    val tag_size : ([> `Parsed | `Valid] id3v2) t -> int
+
+    val parse_tag : ([>`Parsed] id3v2) t -> string -> ([>`Valid] id3v2) t
+
+    val attach_frame : (state id3v2) t -> frame_type -> frame_text -> ([> `Valid] id3v2) t
+
+    val render : ([> `Valid] id3v2) t -> string
+
+    (** {2 Generic set functions} *)
+    
+    (** These functions perform the same operations as their counter-part from [Taglib]. 
+      * The only difference here is that they return a valid tag. *)
+
+    val tag_set_title : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+
+    val tag_set_artist : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+
+    val tag_set_album : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+
+    val tag_set_comment : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+
+    val tag_set_genre : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+
+    val tag_set_year : (state id3v2) t -> int -> ([> `Valid] id3v2) t
+
+    val tag_set_track : (state id3v2) t -> int -> ([> `Valid] id3v2) t
+  end
+end

@@ -84,15 +84,14 @@ val tag_set_track : 'a t -> int -> unit
 
 module File :
 sig
-  type file
-
   (** Supported file types. Warning, types: [WavPack],
     * [Speex] and [TrueAudio] are only supported in
     * Taglib >= 1.5.
     * Types: [Mp4], [Asf] are only supported with
     * Taglib >= 1.6. *)
   type file_type =
-    [ `Mpeg |
+    [ `Autodetect |
+      `Mpeg |
       `OggVorbis |
       `Flac |
       `Mpc |
@@ -102,6 +101,9 @@ sig
       `TrueAudio |
       `Mp4 |
       `Asf ]
+
+  (** Type for a file. *)
+  type 'a file
 
   (** Raised when using a file that has been closed *)
   exception Closed
@@ -119,23 +121,22 @@ sig
 
      Raises [Invalid_file] if taglib could not parse the file.
 
-     Raises [Not_implemented] if using a [file_type] that is not implemented
-     in the system's taglib library. *)
-  val open_file : ?file_type:file_type -> string -> file t
+     Raises [Not_implemented] if taglib could not get a valid file. *)
+  val open_file : file_type -> string -> (file_type file) t
 
-  val close_file : file t -> unit
+  val close_file : ('a file) t -> unit
 
-  val file_save : file t -> bool
+  val file_save : ('a file) t -> bool
 
   (** {2 Get audio properties interface } *)
 
-  val audioproperties_length : file t -> int
+  val audioproperties_length : ('a file) t -> int
 
-  val audioproperties_bitrate : file t -> int
+  val audioproperties_bitrate : ('a file) t -> int
 
-  val audioproperties_samplerate : file t -> int
+  val audioproperties_samplerate : ('a file) t -> int
 
-  val audioproperties_channels : file t -> int
+  val audioproperties_channels : ('a file) t -> int
 end
 
 (** {2 Inline interface } *)
@@ -172,37 +173,37 @@ sig
     (** Text content of a frame. *)
     type frame_text = string
 
-    val init : unit -> ([> `Invalid] id3v2) t
+    val init : unit -> ([`Invalid] id3v2) t
 
     val header_size : int
 
-    val parse_header : ([> `Invalid] id3v2) t -> string -> ([> `Parsed] id3v2) t
+    val parse_header : ([`Invalid] id3v2) t -> string -> ([`Parsed] id3v2) t
 
-    val tag_size : ([> `Parsed | `Valid] id3v2) t -> int
+    val tag_size : ([< `Parsed | `Valid] id3v2) t -> int
 
-    val parse_tag : ([>`Parsed] id3v2) t -> string -> ([>`Valid] id3v2) t
+    val parse_tag : ([`Parsed] id3v2) t -> string -> ([`Valid] id3v2) t
 
-    val attach_frame : (state id3v2) t -> frame_type -> frame_text -> ([> `Valid] id3v2) t
+    val attach_frame : ([< `Invalid | `Valid ] id3v2) t -> frame_type -> frame_text -> ([`Valid] id3v2) t
 
-    val render : ([> `Valid] id3v2) t -> string
+    val render : ([`Valid] id3v2) t -> string
 
     (** {2 Generic set functions} *)
     
     (** These functions perform the same operations as their counter-part from [Taglib]. 
       * The only difference here is that they return a valid tag. *)
 
-    val tag_set_title : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+    val tag_set_title : ([< `Invalid | `Valid ] id3v2) t -> string -> ([`Valid] id3v2) t
 
-    val tag_set_artist : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+    val tag_set_artist : ([< `Invalid | `Valid ] id3v2) t -> string -> ([`Valid] id3v2) t
 
-    val tag_set_album : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+    val tag_set_album : ([< `Invalid | `Valid ] id3v2) t -> string -> ([`Valid] id3v2) t
 
-    val tag_set_comment : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+    val tag_set_comment : ([< `Invalid | `Valid ] id3v2) t -> string -> ([`Valid] id3v2) t
 
-    val tag_set_genre : (state id3v2) t -> string -> ([> `Valid] id3v2) t
+    val tag_set_genre : ([< `Invalid | `Valid ] id3v2) t -> string -> ([`Valid] id3v2) t
 
-    val tag_set_year : (state id3v2) t -> int -> ([> `Valid] id3v2) t
+    val tag_set_year : ([< `Invalid | `Valid ] id3v2) t -> int -> ([`Valid] id3v2) t
 
-    val tag_set_track : (state id3v2) t -> int -> ([> `Valid] id3v2) t
+    val tag_set_track : ([< `Invalid | `Valid ] id3v2) t -> int -> ([`Valid] id3v2) t
   end
 end

@@ -92,8 +92,7 @@ extern "C"
 #include <caml/custom.h>
 CAMLprim value caml_taglib_version(value unit);
 CAMLprim value caml_taglib_init(value unit);
-CAMLprim value caml_taglib_file_new(value name);
-CAMLprim value caml_taglib_file_new_type(value name, value type);
+CAMLprim value caml_taglib_file_new(value type, value name);
 CAMLprim value caml_taglib_file_free(value f);
 CAMLprim value caml_taglib_file_tag(value f);
 CAMLprim value caml_taglib_file_audioproperties(value f);
@@ -125,6 +124,7 @@ CAMLprim value caml_taglib_version(value unit)
 #define get_var(x) var_##x
 
 /* cached polymorphic variants */
+decl_var(Autodetect);
 decl_var(Mpeg);
 decl_var(OggVorbis);
 decl_var(Flac);
@@ -140,6 +140,7 @@ CAMLprim value caml_taglib_init(value unit)
 {
   CAMLparam0();
   /* initialize polymorphic variants */
+  import_var(Autodetect);
   import_var(Mpeg);
   import_var(OggVorbis);
   import_var(Flac);
@@ -157,30 +158,16 @@ CAMLprim value caml_taglib_init(value unit)
 #define Taglib_tag_val(v) (*((Tag**)Data_custom_val(v)))
 #define Taglib_audioproperties_val(v) ((AudioProperties *)v)
 
-CAMLprim value caml_taglib_file_new(value name)
-{
-  CAMLparam1(name);
-
-  File *f = FileRef::create(String_val(name)) ;
-
-  if (f == NULL)
-    caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
-
-  if (!f->isValid()) {
-    delete f;
-    caml_raise_constant(*caml_named_value("taglib_exn_invalid_file"));
-  }
-
-  CAMLreturn((value)f);
-}
-
-CAMLprim value caml_taglib_file_new_type(value name, value type)
+CAMLprim value caml_taglib_file_new(value type, value name)
 {
   CAMLparam2(name,type);
 
   File *f = NULL;
   const char *filename = String_val(name);
-  if (type == get_var(Mpeg))
+
+  if (type == get_var(Autodetect))
+      f = FileRef::create(filename);
+  else if (type == get_var(Mpeg))
       f = new MPEG::File(filename);
   else if (type == get_var(OggVorbis))
       f = new Ogg::Vorbis::File(filename);

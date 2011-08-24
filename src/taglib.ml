@@ -55,9 +55,9 @@ struct
     { taglib_file : taglib_file;
       audioproperties : audioproperties;
       tag : tag }
-  type file = fileref option ref
   type file_type =
-    [ `Mpeg |
+    [ `Autodetect |
+      `Mpeg |
       `OggVorbis |
       `Flac |
       `Mpc |
@@ -67,6 +67,7 @@ struct
       `TrueAudio |
       `Mp4 |
       `Asf ]
+  type 'a file = 'a * (fileref option ref)
 
   exception Invalid_file
   exception Closed
@@ -76,13 +77,11 @@ struct
     Callback.register_exception "taglib_exn_invalid_file" Invalid_file;
     Callback.register_exception "taglib_exn_not_implemented" Not_implemented
 
-  external open_file : string -> taglib_file = "caml_taglib_file_new"
-
-  external open_file_type : string -> file_type -> taglib_file = "caml_taglib_file_new_type"
+  external open_file : file_type -> string -> taglib_file = "caml_taglib_file_new"
 
   external close_file : taglib_file -> unit = "caml_taglib_file_free"
 
-  let close_file (d,_) = 
+  let close_file ((_,d),_) = 
     match !d with
       | None -> ()
       | Some f -> 
@@ -95,13 +94,13 @@ struct
 
   external file_save : taglib_file -> bool = "caml_taglib_file_save"
 
-  let file_save (d,_) = 
+  let file_save ((_,d),_) = 
     match !d with
       | None -> raise Closed
       | Some f -> file_save f.taglib_file
 
-  let open_file ?file_type name =
-    (* Test wether file exist to avoid library issue.
+  let open_file file_type name =
+    (* Test whether file exist to avoid library issue.
        See: http://bugs.debian.org/454732 *)
     begin
       try
@@ -109,24 +108,21 @@ struct
       with
         | _ -> raise Not_found
     end ;
-    let f =
-      match file_type with
-        | None -> open_file name
-        | Some m -> open_file_type name m
-    in
+    let f = open_file file_type name in
     let tag = file_tag f in
     let prop = file_audioproperties f in
     let file = ref (Some { taglib_file = f;
                            audioproperties = prop;
                            tag = tag })
     in
-    file, (fun f -> match !f with
-                      | None -> raise Closed
-                      | Some f -> f.tag)
+    (file_type,file), (fun (_,f) -> 
+                          match !f with
+                            | None -> raise Closed
+                            | Some f -> f.tag)
 
   external audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
 
-  let audioproperties_get_int (f,_) s =
+  let audioproperties_get_int ((_,f),_) s =
     match !f with
       | None -> raise Closed;
       | Some f -> audioproperties_get_int f.audioproperties s

@@ -41,8 +41,7 @@ let () =
   init ()
 
 type tag
-type audioproperties
-type 'a t = ('a * tag * (audioproperties option)) option ref 
+type 'a t = 'a * ('a -> tag)
 
 external version : unit -> string = "caml_taglib_version"
 
@@ -50,7 +49,13 @@ let version = version ()
 
 module File = 
 struct
-  type file
+  type taglib_file
+  type audioproperties
+  type fileref = 
+    { taglib_file : taglib_file;
+      audioproperties : audioproperties;
+      tag : tag }
+  type file = fileref option ref
   type file_type =
     [ `Mpeg |
       `OggVorbis |
@@ -71,29 +76,29 @@ struct
     Callback.register_exception "taglib_exn_invalid_file" Invalid_file;
     Callback.register_exception "taglib_exn_not_implemented" Not_implemented
 
-  external open_file : string -> file = "caml_taglib_file_new"
+  external open_file : string -> taglib_file = "caml_taglib_file_new"
 
-  external open_file_type : string -> file_type -> file = "caml_taglib_file_new_type"
+  external open_file_type : string -> file_type -> taglib_file = "caml_taglib_file_new_type"
 
-  external close_file : file -> unit = "caml_taglib_file_free"
+  external close_file : taglib_file -> unit = "caml_taglib_file_free"
 
-  let close_file d = 
+  let close_file (d,_) = 
     match !d with
       | None -> ()
-      | Some (f,_,_) -> 
-          close_file f ; 
+      | Some f -> 
+          close_file f.taglib_file ; 
           d := None
 
-  external file_tag : file -> tag = "caml_taglib_file_tag"
+  external file_tag : taglib_file -> tag = "caml_taglib_file_tag"
 
-  external file_audioproperties : file -> audioproperties = "caml_taglib_file_audioproperties"
+  external file_audioproperties : taglib_file -> audioproperties = "caml_taglib_file_audioproperties"
 
-  external file_save : file -> bool = "caml_taglib_file_save"
+  external file_save : taglib_file -> bool = "caml_taglib_file_save"
 
-  let file_save d = 
+  let file_save (d,_) = 
     match !d with
       | None -> raise Closed
-      | Some (f,_,_) -> file_save f
+      | Some f -> file_save f.taglib_file
 
   let open_file ?file_type name =
     (* Test wether file exist to avoid library issue.
@@ -111,15 +116,20 @@ struct
     in
     let tag = file_tag f in
     let prop = file_audioproperties f in
-    ref (Some (f,tag,Some prop))
+    let file = ref (Some { taglib_file = f;
+                           audioproperties = prop;
+                           tag = tag })
+    in
+    file, (fun f -> match !f with
+                      | None -> raise Closed
+                      | Some f -> f.tag)
 
   external audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
 
-  let audioproperties_get_int f s =
+  let audioproperties_get_int (f,_) s =
     match !f with
       | None -> raise Closed;
-      | Some (_,_, None) -> raise Not_implemented
-      | Some (_,_, Some p) -> audioproperties_get_int p s
+      | Some f -> audioproperties_get_int f.audioproperties s
 
   let audioproperties_length p = audioproperties_get_int p "length"
 
@@ -130,10 +140,7 @@ struct
   let audioproperties_channels p = audioproperties_get_int p "channels"
 end
 
-let tag_extract f = 
-  match !f with
-    | None -> raise File.Closed
-    | Some (_,t,_) -> t
+let tag_extract (x,f) = f x
 
 external tag_get_string : tag -> string -> string = "caml_taglib_tag_get_string"
 
@@ -194,16 +201,13 @@ struct
 
     let init () = 
       let t = init () in
-      ref (Some ((), t, None))
+      (), (fun () -> t)
 
     external header_size : unit -> int = "caml_taglib_id3v2_header_len"
 
     let header_size = header_size ()
 
-    let grab_tag t = 
-       match !t with
-         | Some (_, t, _) -> t
-         | _ -> assert false
+    let grab_tag (_,f) = f () 
 
     external parse_header : tag -> string -> unit = "caml_taglib_id3v2_parse_header"
 

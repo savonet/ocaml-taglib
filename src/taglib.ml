@@ -51,10 +51,6 @@ module File =
 struct
   type taglib_file
   type audioproperties
-  type fileref = 
-    { taglib_file : taglib_file;
-      audioproperties : audioproperties;
-      tag : tag }
   type file_type =
     [ `Autodetect |
       `Mpeg |
@@ -67,7 +63,12 @@ struct
       `TrueAudio |
       `Mp4 |
       `Asf ]
-  type 'a file = 'a * (fileref option ref)
+  type 'a fileref =
+    { file_type : file_type as 'a;
+      taglib_file : taglib_file;
+      audioproperties : audioproperties;
+      tag : tag }
+  type 'a file = 'a fileref option ref
 
   exception Invalid_file
   exception Closed
@@ -81,7 +82,7 @@ struct
 
   external close_file : taglib_file -> unit = "caml_taglib_file_free"
 
-  let close_file ((_,d),_) = 
+  let close_file (d,_) = 
     match !d with
       | None -> ()
       | Some f -> 
@@ -94,10 +95,15 @@ struct
 
   external file_save : taglib_file -> bool = "caml_taglib_file_save"
 
-  let file_save ((_,d),_) = 
+  let file_save (d,_) = 
     match !d with
       | None -> raise Closed
       | Some f -> file_save f.taglib_file
+
+  let file_type (f,_) = 
+    match !f with
+      | None -> raise Closed
+      | Some f -> f.file_type
 
   let open_file file_type name =
     (* Test whether file exist to avoid library issue.
@@ -112,17 +118,18 @@ struct
     let tag = file_tag f in
     let prop = file_audioproperties f in
     let file = ref (Some { taglib_file = f;
+                           file_type = file_type ;
                            audioproperties = prop;
                            tag = tag })
     in
-    (file_type,file), (fun (_,f) -> 
-                          match !f with
-                            | None -> raise Closed
-                            | Some f -> f.tag)
+    file, (fun f -> 
+              match !f with
+                | None -> raise Closed
+                | Some f -> f.tag)
 
   external audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
 
-  let audioproperties_get_int ((_,f),_) s =
+  let audioproperties_get_int (f,_) s =
     match !f with
       | None -> raise Closed;
       | Some f -> audioproperties_get_int f.audioproperties s

@@ -104,6 +104,7 @@ sig
 
   (** Type for a file. *)
   type 'a file
+    constraint 'a = file_type
 
   (** Raised when using a file that has been closed *)
   exception Closed
@@ -124,19 +125,21 @@ sig
      Raises [Not_implemented] if taglib could not get a valid file. *)
   val open_file : file_type -> string -> (file_type file) t
 
-  val close_file : ('a file) t -> unit
+  val close_file : (file_type file) t -> unit
 
-  val file_save : ('a file) t -> bool
+  val file_save : (file_type file) t -> bool
+
+  val file_type : (file_type file) t -> file_type
 
   (** {2 Get audio properties interface } *)
 
-  val audioproperties_length : ('a file) t -> int
+  val audioproperties_length : (file_type file) t -> int
 
-  val audioproperties_bitrate : ('a file) t -> int
+  val audioproperties_bitrate : (file_type file) t -> int
 
-  val audioproperties_samplerate : ('a file) t -> int
+  val audioproperties_samplerate : (file_type file) t -> int
 
-  val audioproperties_channels : ('a file) t -> int
+  val audioproperties_channels : (file_type file) t -> int
 end
 
 (** {2 Inline interface } *)

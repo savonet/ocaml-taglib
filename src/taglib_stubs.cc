@@ -446,7 +446,7 @@ CAMLprim value caml_taglib_id3v2_parse_tag(value t, value h)
   CAMLparam2(t,h);
   myId3v2 *tag = Id3v2_tag_val(t);
   char *s = String_val(h);
-  uint size = ID3v2::Header::size();
+  TagLib::uint size = ID3v2::Header::size();
 
   tag->doParse(ByteVector(s+size,caml_string_length(h)-size));
   CAMLreturn(Val_unit);

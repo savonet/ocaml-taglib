@@ -35,17 +35,18 @@
 
 (** Ocaml bindings to taglib *)
 
-(** This library provides a set/get interface for several audio file format's tags informations.
+(** Taglib provides a set/get interface for several audio file format's tags informations.
+  *
+  * All strings used in this module should be UTF8-encoded. *)
 
-    All strings used in this module should be UTF8-encoded. *)
+(** {2 Types } *)
 
-(** {1 Types } *)
-
+(** Main type. *)
 type 'a t
 
-(** {1 Functions } *)
+(** {2 Values } *)
 
-(** Library's version. *)
+(** Taglib's version. *)
 val version : string
 
 (** {2 Generic tag interface } *)
@@ -122,7 +123,7 @@ sig
 
      Raises [Invalid_file] if taglib could not parse the file.
 
-     Raises [Not_implemented] if taglib could not get a valid file. *)
+     Raises [Not_implemented] if given [file_type] is not implemented by taglib. *)
   val open_file : file_type -> string -> (file_type file) t
 
   val close_file : (file_type file) t -> unit
@@ -159,7 +160,9 @@ sig
     *
     * Currently, only attaching text-based frames are supported. 
     * Reading tag's frames can only be done currently through the
-    * common [tag_title], ... API. *)
+    * common [tag_title], ... API. 
+    *
+    * See [examples/tagutil.ml] for an example of the use of this module. *)
   module Id3v2 : 
   sig
     type 'a id3v2
@@ -210,3 +213,41 @@ sig
     val tag_set_track : ([< `Invalid | `Valid ] id3v2) t -> int -> ([`Valid] id3v2) t
   end
 end
+
+(** {2 Deprecated } *)
+
+(** This section is for backward compatibility with previous API. It 
+  * may be removed at any time. *)
+
+type file_type =
+       Mpeg |
+       OggVorbis |
+       Flac |
+       Mpc |
+       OggFlac |
+       WavPack |
+       Speex |
+       TrueAudio |
+       Mp4 |
+       Asf
+
+exception Closed
+exception Not_implemented
+
+(** This does not do anything now.. *)
+val set_strings_unicode : bool -> unit
+
+val open_file : ?file_type:file_type -> string -> (File.file_type File.file) t
+
+val audioproperties_length : (File.file_type File.file) t -> int
+
+val audioproperties_bitrate : (File.file_type File.file) t -> int
+
+val audioproperties_samplerate : (File.file_type File.file) t -> int
+
+val audioproperties_channels : (File.file_type File.file) t -> int
+
+val close_file : (File.file_type File.file) t -> unit
+
+val file_save : (File.file_type File.file) t -> bool
+

@@ -4,7 +4,8 @@ PROGNAME := ocaml-taglib
 DISTFILES := CHANGES COPYING Makefile.in README \
 	bootstrap configure configure.ac m4/*.m4 config.h.in \
 	src/*.ml src/*.mli src/*.c src/*.cc src/Makefile.in src/META.in \
-	src/OCamlMakefile 
+	src/OCamlMakefile examples/Makefile examples/OCamlMakefile \
+        examples/*.ml 
 VERSION = @VERSION@
 
 all clean install uninstall:

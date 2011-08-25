@@ -273,3 +273,58 @@ struct
       t
   end
 end
+
+type file_type =
+       Mpeg |
+       OggVorbis |
+       Flac |
+       Mpc |
+       OggFlac |
+       WavPack |
+       Speex |
+       TrueAudio |
+       Mp4 |
+       Asf
+
+exception Closed
+exception Not_implemented
+
+let set_strings_unicode _ = ()
+
+let open_file ?file_type f = 
+  let f x = File.open_file x f in
+  match file_type with
+    | None -> f `Autodetect
+    | Some t ->
+       begin match t with
+         | Mpeg -> f `Mpeg
+         | OggVorbis -> f `OggVorbis
+         | Flac -> f `Flac
+         | Mpc -> f `Mpc
+         | OggFlac -> f `OggFlac
+         | WavPack -> f `WavPack
+         | Speex -> f `Speex
+         | TrueAudio -> f `TrueAudio
+         | Mp4 -> f `Mp4
+         | Asf -> f `Asf
+       end
+
+let w f t = 
+   try
+     f t
+   with
+     | File.Closed -> raise Closed
+     | File.Not_implemented -> raise Not_implemented
+
+let audioproperties_length = w File.audioproperties_length
+
+let audioproperties_bitrate = w File.audioproperties_bitrate
+
+let audioproperties_samplerate = w File.audioproperties_samplerate
+
+let audioproperties_channels = w File.audioproperties_channels
+
+let close_file = w File.close_file
+
+let file_save = w File.file_save
+

@@ -64,11 +64,14 @@ struct
       `Mp4 |
       `Asf ]
   type 'a fileref =
-    { file_type : file_type as 'a;
+    { file_type : 'a;
       taglib_file : taglib_file;
       audioproperties : audioproperties;
       tag : tag }
-  type 'a file = 'a fileref option ref
+       constraint 'a = [< file_type]
+  (** Type for a file. *)
+  type 'a file_tag = 'a fileref option ref
+  type 'a file = 'a file_tag t
 
   exception Invalid_file
   exception Closed
@@ -193,8 +196,12 @@ module Inline =
 struct
   module Id3v2 = 
   struct
-    type 'a id3v2 = unit 
     type state = [ `Invalid | `Parsed | `Valid ]
+
+    type 'a id3v2_tag = unit
+      constraint 'a = [< state]
+
+    type 'a id3v2 = 'a id3v2_tag t 
 
     type frame_type = string
 
@@ -210,7 +217,7 @@ struct
 
     let header_size = header_size ()
 
-    let grab_tag (_,f) = f () 
+    let grab_tag ((),f) = f () 
 
     external parse_header : tag -> string -> unit = "caml_taglib_id3v2_parse_header"
 

@@ -1,4 +1,4 @@
-0.2.0 ()
+0.2.0 (31-08-2011)
 =====
 * Reworked binding using C++ functions
 * Added Inline module to manipulate binary

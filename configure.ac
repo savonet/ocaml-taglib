@@ -21,15 +21,7 @@ CPPFLAGS="$CPPFLAGS -I .."
 AC_CHECK_TOOL([AR],[ar],no)
 AC_SUBST(AR)
 PKG_PROG_PKG_CONFIG()
-#PKG_CHECK_MODULES(taglib, taglib_c, , [AC_MSG_ERROR(taglib not found.)])
-
-# PKG_CHECK_MODULES loses when you need --libs-only-[lL]
-if ! $PKG_CONFIG --exists taglib; then
-        AC_MSG_ERROR([taglib not found])
-fi
-CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags taglib` -fPIC"
-LIBS="`$LIBS $PKG_CONFIG --libs-only-l taglib` -lstdc++"
-LDFLAGS=`$LDFLAGS $PKG_CONFIG --libs-only-L taglib`
+PKG_CONFIG_CHECK_MODULE([taglib])
 
 # Now testing for recent classes:
 AC_CPP_CHECK_CLASS([tag],[wavpackfile.h],[TagLib::WavPack::File],[HAVE_WAVPACK])

@@ -23,6 +23,9 @@ AC_SUBST(AR)
 PKG_PROG_PKG_CONFIG()
 PKG_CONFIG_CHECK_MODULE([taglib])
 
+# Need to add -lstdc++
+LDFLAGS="$LDFLAGS -lstdc++"
+
 # Now testing for recent classes:
 AC_CPP_CHECK_CLASS([tag],[wavpackfile.h],[TagLib::WavPack::File],[HAVE_WAVPACK])
 AC_CPP_CHECK_CLASS([tag],[speexfile.h],[TagLib::Ogg::Speex::File],[HAVE_SPEEX])

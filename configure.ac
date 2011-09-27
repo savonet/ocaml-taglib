@@ -1,30 +1,21 @@
 
 # check for one particular file of the sources 
-AC_INIT(ocaml-taglib, 0.2.0, savonet-users@lists.sourceforge.net)
+AC_INIT([ocaml-taglib],[0.2.0],[savonet-users@lists.sourceforge.net])
 
 VERSION=$PACKAGE_VERSION
 AC_MSG_RESULT([configuring $PACKAGE_STRING])
 
-# Add prefix to compilation variables
-# if passed
-if test "x$prefix" != "xNONE"; then
-        CFLAGS="$CFLAGS -I$prefix/include"
-        LDFLAGS="$LDFLAGS -L$prefix/lib"
-        CPPFLAGS="$CPPFLAGS -I$prefix/include"
-fi
-
-AC_CHECK_OCAML_COMPILERS()
+AC_BASE_CHECKS()
 
 AC_PROG_CXX()
 AC_CONFIG_HEADERS([config.h])
 CPPFLAGS="$CPPFLAGS -I .."
-AC_CHECK_TOOL([AR],[ar],no)
-AC_SUBST(AR)
+
 PKG_PROG_PKG_CONFIG()
 PKG_CONFIG_CHECK_MODULE([taglib])
 
 # Need to add -lstdc++
-LDFLAGS="$LDFLAGS -lstdc++"
+LIBS="$LIBS -lstdc++"
 
 # Now testing for recent classes:
 AC_CPP_CHECK_CLASS([tag],[wavpackfile.h],[TagLib::WavPack::File],[HAVE_WAVPACK])

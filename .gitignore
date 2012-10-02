@@ -16,3 +16,5 @@ src/*.a
 src/*.cm*
 src/*.o
 src/*.so
+config.h
+config.h.in

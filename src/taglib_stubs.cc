@@ -73,6 +73,8 @@
 #include <trueaudiofile.h>
 #endif
 
+#include <tlist.h>
+#include <tpropertymap.h>
 #include <tag.h>
 #include <string.h>
 #include <id3v2tag.h>
@@ -99,8 +101,10 @@ CAMLprim value caml_taglib_file_audioproperties(value f);
 CAMLprim value caml_taglib_file_save(value f);
 CAMLprim value caml_taglib_tag_get_string(value t, value name);
 CAMLprim value caml_taglib_tag_get_int(value t, value name);
+CAMLprim value caml_taglib_tag_get_properties(value t, value fn);
 CAMLprim value caml_taglib_tag_set_string(value t, value name, value v);
 CAMLprim value caml_taglib_tag_set_int(value t, value name, value v);
+CAMLprim value caml_taglib_tag_set_properties(value t, value properties);
 CAMLprim value caml_taglib_audioproperties_get_int(value p, value name);
 CAMLprim value caml_taglib_id3v2_init(value unit);
 CAMLprim value caml_taglib_id3v2_clean(value t);
@@ -318,6 +322,27 @@ CAMLprim value caml_taglib_tag_get_int(value t, value name)
   CAMLreturn(Val_int(tmp));
 }
 
+CAMLprim value caml_taglib_tag_get_properties(value t, value fn)
+{
+  CAMLparam2(t, fn);
+  const Tag *tag = Taglib_tag_val(t) ;
+  PropertyMap props = tag->properties();
+  PropertyMap::Iterator i;
+  StringList l;
+  const char *key;
+  StringList::Iterator j;
+
+  for (i = props.begin(); i != props.end(); i++) {
+    key = (*i).first.toCString(bool(true));
+    l = (*i).second;
+    for (j = l.begin(); j != l.end(); j++) {
+      caml_callback2(fn, caml_copy_string(key), caml_copy_string((*j).toCString(bool(true))));
+    }
+  }
+
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value caml_taglib_tag_set_string(value t, value name, value v)
 {
   CAMLparam3(t,name, v);
@@ -354,6 +379,42 @@ CAMLprim value caml_taglib_tag_set_int(value t, value name, value v)
       tag->setTrack(x) ;
     else
       caml_failwith("Invalid value");
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value caml_taglib_tag_set_properties(value t, value properties)
+{
+  CAMLparam2(t, properties);
+  CAMLlocal1(caml_values);
+  Tag *tag = Taglib_tag_val(t);
+  PropertyMap props;
+  char *caml_key;
+  StringList *values;
+  String *key;
+  int i,j;
+  
+  for (i = 0; i < Wosize_val(properties); i++) {
+    caml_key = String_val(Field(Field(properties,i),0));
+    caml_values = Field(Field(properties,i),1);
+
+    key = new String(caml_key, String::UTF8);
+    values = new StringList();
+    for (j = 0; j < Wosize_val(caml_values); j++) {
+      values->append(String_val(Field(caml_values,j)));
+    }
+
+    props.insert(*key, *values);
+
+    delete key, values;
+  }
+
+  // TODO: Catch this:
+  // This default implementation sets only the tags for which 
+  // setter methods exist in this class (artist, album, ...), and
+  // only one value per key; the rest will be contained in the
+  // returned PropertyMap.
+  tag->setProperties(props);
 
   CAMLreturn(Val_unit);
 }

@@ -65,6 +65,8 @@ val tag_year : 'a t -> int
 
 val tag_track : 'a t -> int
 
+val tag_properties : 'a t -> (string, string list) Hashtbl.t
+
 (** {2 Set tag interface } *)
 
 val tag_set_title : 'a t -> string -> unit
@@ -80,6 +82,8 @@ val tag_set_genre : 'a t -> string -> unit
 val tag_set_year : 'a t -> int -> unit
 
 val tag_set_track : 'a t -> int -> unit
+
+val tag_set_properties : 'a t -> (string, string list) Hashtbl.t -> unit
 
 (** {2 File interface } *)
 
@@ -217,6 +221,8 @@ sig
     val tag_set_year : [< `Invalid | `Valid ] id3v2 -> int -> [`Valid] id3v2
 
     val tag_set_track : [< `Invalid | `Valid ] id3v2 -> int -> [`Valid] id3v2
+
+    val tag_set_properties : [< `Invalid | `Valid ] id3v2 -> (string, string list) Hashtbl.t -> [`Valid] id3v2
   end
 end
 

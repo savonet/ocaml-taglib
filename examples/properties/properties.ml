@@ -1,7 +1,7 @@
 let () =
   let fname = Sys.argv.(1) in
   let f = Taglib.File.open_file `Autodetect fname in
-  let prop = Taglib.tag_properties f in
+  let prop = Taglib.File.properties f in
   Hashtbl.iter
     (fun t v ->
       let v = String.concat " / " v in

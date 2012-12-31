@@ -130,6 +130,28 @@ struct
                 | None -> raise Closed
                 | Some f -> f.tag)
 
+  external properties : taglib_file -> (string -> string -> unit) -> unit = "caml_taglib_file_get_properties"
+
+  (* TODO: share code with tag_get_properties *)
+  let properties ((f,_) : file_type file) =
+    let f =
+      match !f with
+      | None -> raise Closed
+      | Some f -> f.taglib_file
+    in
+    let props = Hashtbl.create 5 in
+    let fn key value =
+      let values =
+        try
+          Hashtbl.find props key
+        with
+        | Not_found -> []
+      in
+      Hashtbl.replace props key (value::values)
+    in
+    properties f fn;
+    props
+
   external audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
 
   let audioproperties_get_int (f,_) s =

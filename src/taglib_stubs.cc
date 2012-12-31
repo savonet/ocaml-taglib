@@ -101,6 +101,7 @@ CAMLprim value caml_taglib_file_audioproperties(value f);
 CAMLprim value caml_taglib_file_save(value f);
 CAMLprim value caml_taglib_tag_get_string(value t, value name);
 CAMLprim value caml_taglib_tag_get_int(value t, value name);
+CAMLprim value caml_taglib_file_get_properties(value f, value fn);
 CAMLprim value caml_taglib_tag_get_properties(value t, value fn);
 CAMLprim value caml_taglib_tag_set_string(value t, value name, value v);
 CAMLprim value caml_taglib_tag_set_int(value t, value name, value v);
@@ -320,6 +321,27 @@ CAMLprim value caml_taglib_tag_get_int(value t, value name)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
 
   CAMLreturn(Val_int(tmp));
+}
+
+CAMLprim value caml_taglib_file_get_properties(value f, value fn)
+{
+  CAMLparam2(f, fn);
+  File *file = Taglib_file_val(f) ;
+  PropertyMap props = file->properties();
+  PropertyMap::Iterator i;
+  StringList l;
+  const char *key;
+  StringList::Iterator j;
+
+  for (i = props.begin(); i != props.end(); i++) {
+    key = (*i).first.toCString(bool(true));
+    l = (*i).second;
+    for (j = l.begin(); j != l.end(); j++) {
+      caml_callback2(fn, caml_copy_string(key), caml_copy_string((*j).toCString(bool(true))));
+    }
+  }
+
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value caml_taglib_tag_get_properties(value t, value fn)

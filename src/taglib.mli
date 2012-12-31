@@ -138,6 +138,8 @@ sig
 
   val file_type : file_type file -> file_type
 
+  val properties : file_type file -> (string, string list) Hashtbl.t
+
   (** {2 Get audio properties interface } *)
 
   val audioproperties_length : file_type file -> int

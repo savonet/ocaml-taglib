@@ -101,7 +101,6 @@ CAMLprim value caml_taglib_file_save(value f);
 CAMLprim value caml_taglib_tag_get_string(value t, value name);
 CAMLprim value caml_taglib_tag_get_int(value t, value name);
 CAMLprim value caml_taglib_file_get_properties(value f, value fn);
-CAMLprim value caml_taglib_tag_get_properties(value t, value fn);
 CAMLprim value caml_taglib_tag_set_string(value t, value name, value v);
 CAMLprim value caml_taglib_tag_set_int(value t, value name, value v);
 CAMLprim value caml_taglib_file_set_properties(value t, value properties);

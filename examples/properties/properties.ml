@@ -7,4 +7,7 @@ let () =
       let v = String.concat " / " v in
       Printf.printf " - %s : %s\n%!" t v)
     prop;
+  Hashtbl.replace prop "PUBLISHER" ["foobarlol"];
+  Taglib.File.set_properties f prop;
+  ignore(Taglib.File.file_save f);
   Taglib.File.close_file f

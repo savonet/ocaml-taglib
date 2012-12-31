@@ -132,8 +132,7 @@ struct
 
   external properties : taglib_file -> (string -> string -> unit) -> unit = "caml_taglib_file_get_properties"
 
-  (* TODO: share code with tag_get_properties *)
-  let properties ((f,_) : file_type file) =
+  let properties (f,_) =
     let f =
       match !f with
       | None -> raise Closed
@@ -151,6 +150,20 @@ struct
     in
     properties f fn;
     props
+
+  external set_properties : taglib_file -> (string * (string array)) array -> unit = "caml_taglib_file_set_properties"
+
+  let set_properties (f,_) props = 
+    let f =
+      match !f with
+      | None -> raise Closed
+      | Some f -> f.taglib_file
+    in
+    let props = Hashtbl.fold (fun key values props ->
+      (key, Array.of_list values) :: props) props []
+    in
+    set_properties f (Array.of_list props)
+
 
   external audioproperties_get_int : audioproperties -> string -> int = "caml_taglib_audioproperties_get_int"
 
@@ -214,30 +227,6 @@ let tag_set_year t = tag_set_int t "year"
 
 let tag_set_track t = tag_set_int t "track"
 
-external tag_properties : tag -> (string -> string -> unit) -> unit = "caml_taglib_tag_get_properties"
-
-let tag_properties tag =
-  let props = Hashtbl.create 5 in
-  let fn key value =
-    let values =
-      try
-        Hashtbl.find props key
-      with
-        | Not_found -> []
-    in
-    Hashtbl.replace props key (value::values)
-  in
-  tag_properties (tag_extract tag) fn;
-  props
-
-external tag_set_properties : tag -> (string * (string array)) array -> unit = "caml_taglib_tag_set_properties"
-
-let tag_set_properties tag props = 
-  let props = Hashtbl.fold (fun key values props ->
-    (key, Array.of_list values) :: props) props []
-  in
-  tag_set_properties (tag_extract tag) (Array.of_list props)
-
 module Inline = 
 struct
   module Id3v2 = 
@@ -295,10 +284,6 @@ struct
 
     let attach_frame t l c = 
       attach_frame (grab_tag t) l c;
-      t
-
-    let tag_set_properties t s =
-      tag_set_properties t s;
       t
 
     let tag_set_title t s = 

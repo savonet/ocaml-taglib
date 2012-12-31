@@ -1,7 +1,7 @@
 SOURCES = tagutil.ml
 RESULT = tagutil
 LIBS = unix taglib
-INCDIRS = ../src
+INCDIRS = ../../src
 
 all: nc
 

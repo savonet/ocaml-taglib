@@ -1,5 +1,3 @@
-
-# check for one particular file of the sources 
 AC_INIT([ocaml-taglib],[0.2.0],[savonet-users@lists.sourceforge.net])
 
 VERSION=$PACKAGE_VERSION
@@ -12,12 +10,13 @@ AC_CONFIG_HEADERS([config.h])
 CPPFLAGS="$CPPFLAGS -I .."
 
 PKG_PROG_PKG_CONFIG()
-PKG_CONFIG_CHECK_MODULE([taglib],[1.8])
+PKG_CONFIG_CHECK_MODULE([taglib],[1.7])
 
 # Need to add -lstdc++
 LIBS="$LIBS -lstdc++"
 
 # Now testing for recent classes:
+AC_CPP_CHECK_CLASS([tag],[tpropertymap.h],[TagLib::PropertyMap],[HAVE_PROPERTIES])
 AC_CPP_CHECK_CLASS([tag],[wavpackfile.h],[TagLib::WavPack::File],[HAVE_WAVPACK])
 AC_CPP_CHECK_CLASS([tag],[speexfile.h],[TagLib::Ogg::Speex::File],[HAVE_SPEEX])
 AC_CPP_CHECK_CLASS([tag],[mp4file.h],[TagLib::MP4::File],[HAVE_MP4])

@@ -27,6 +27,7 @@ OCAMLLIBPATH = @CAMLLIBPATH@
 
 SOURCES = taglib_stubs.cc taglib.ml taglib.mli
 RESULT = taglib
+ANNOTATE = true
 OCAMLDOCFLAGS = -stars
 LIBINSTALL_FILES = $(wildcard *.mli *.cmi *.cma *.cmxa *.cmx *.a *.so)
 ACLIBS = @LIBS@

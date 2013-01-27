@@ -73,7 +73,12 @@
 #include <trueaudiofile.h>
 #endif
 
+#ifdef HAVE_PROPERTIES
 #include <tpropertymap.h>
+#else
+#include <stdio.h>
+#endif
+
 #include <tag.h>
 #include <string.h>
 #include <id3v2tag.h>
@@ -325,6 +330,8 @@ CAMLprim value caml_taglib_file_get_properties(value f, value fn)
 {
   CAMLparam2(f, fn);
   File *file = Taglib_file_val(f) ;
+
+#ifdef HAVE_PROPERTIES
   PropertyMap props = file->properties();
   PropertyMap::Iterator i;
   StringList l;
@@ -338,6 +345,19 @@ CAMLprim value caml_taglib_file_get_properties(value f, value fn)
       caml_callback2(fn, caml_copy_string(key), caml_copy_string((*j).toCString(bool(true))));
     }
   }
+#else
+  const Tag *tag = file->tag();
+  caml_callback2(fn, caml_copy_string("title"), caml_copy_string(tag->title().toCString(bool(true))));
+  caml_callback2(fn, caml_copy_string("artist"), caml_copy_string(tag->artist().toCString(bool(true))));
+  caml_callback2(fn, caml_copy_string("album"), caml_copy_string(tag->album().toCString(bool(true))));
+  caml_callback2(fn, caml_copy_string("comment"), caml_copy_string(tag->comment().toCString(bool(true))));
+  caml_callback2(fn, caml_copy_string("genre"), caml_copy_string(tag->genre().toCString(bool(true))));
+  char s[16];
+  snprintf(s, 16, "%d", tag->year());
+  caml_callback2(fn, caml_copy_string("year"), caml_copy_string(s));
+  snprintf(s, 16, "%d", tag->track());
+  caml_callback2(fn, caml_copy_string("track"), caml_copy_string(s));
+#endif
 
   CAMLreturn(Val_unit);
 }
@@ -345,6 +365,8 @@ CAMLprim value caml_taglib_file_get_properties(value f, value fn)
 CAMLprim value caml_taglib_file_set_properties(value f, value properties)
 {
   CAMLparam2(f, properties);
+
+#ifdef HAVE_PROPERTIES
   CAMLlocal1(caml_values);
   File *file = Taglib_file_val(f);
   PropertyMap props;
@@ -374,6 +396,9 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
   // only one value per key; the rest will be contained in the
   // returned PropertyMap.
   file->setProperties(props);
+#else
+  caml_failwith("Not implemented with taglib < 1.8.");
+#endif
 
   CAMLreturn(Val_unit);
 }

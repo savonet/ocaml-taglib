@@ -10,7 +10,7 @@ AC_CONFIG_HEADERS([config.h])
 CPPFLAGS="$CPPFLAGS -I .."
 
 PKG_PROG_PKG_CONFIG()
-PKG_CONFIG_CHECK_MODULE([taglib],[1.7])
+PKG_CONFIG_CHECK_MODULE([taglib],[1.6])
 
 # Need to add -lstdc++
 LIBS="$LIBS -lstdc++"

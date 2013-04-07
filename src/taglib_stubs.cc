@@ -95,6 +95,11 @@ extern "C"
 #include <caml/fail.h>
 #include <caml/memory.h>
 #include <caml/signals.h>
+
+/* Use new thread syntax in a backward fashion. */
+#define caml_acquire_runtime_system caml_leave_blocking_section
+#define caml_release_runtime_system caml_enter_blocking_section
+
 #include <caml/custom.h>
 CAMLprim value caml_taglib_version(value unit);
 CAMLprim value caml_taglib_init(value unit);
@@ -171,44 +176,57 @@ CAMLprim value caml_taglib_file_new(value type, value name)
   CAMLparam2(name,type);
 
   File *f = NULL;
-  const char *filename = String_val(name);
+  char *filename = (char *)malloc(caml_string_length(name));
+
+  if (filename == NULL)
+    caml_raise_out_of_memory();
+
+  memcpy(filename, String_val(name), caml_string_length(name));
+
+  caml_release_runtime_system();
 
   if (type == get_var(Autodetect))
-      f = FileRef::create(filename);
+    f = FileRef::create(filename);
   else if (type == get_var(Mpeg))
-      f = new MPEG::File(filename);
+    f = new MPEG::File(filename);
   else if (type == get_var(OggVorbis))
-      f = new Ogg::Vorbis::File(filename);
+    f = new Ogg::Vorbis::File(filename);
   else if (type == get_var(Flac))
-      f = new FLAC::File(filename);
+    f = new FLAC::File(filename);
 #ifdef HAVE_MPC
   else if (type == get_var(Mpc))
-      f = new MPC::File(filename);
+    f = new MPC::File(filename);
 #endif
   else if (type == get_var(OggFlac))
-      f = new Ogg::FLAC::File(filename);
+    f = new Ogg::FLAC::File(filename);
 #ifdef HAVE_WAVPACK
   else if (type == get_var(WavPack))
-      f = new MPEG::File(filename);
+    f = new MPEG::File(filename);
 #endif
 #ifdef HAVE_SPEEX
-    else if (type == get_var(Speex))
-      f = new Ogg::Speex::File(filename);
+  else if (type == get_var(Speex))
+    f = new Ogg::Speex::File(filename);
 #endif
 #ifdef HAVE_TRUEAUDIO
-    else if (type == get_var(TrueAudio))
-      f = new TrueAudio::File(filename);
+  else if (type == get_var(TrueAudio))
+    f = new TrueAudio::File(filename);
 #endif
 #ifdef HAVE_MP4
-    else if (type == get_var(Mp4))
-      f = new MP4::File(filename);
+  else if (type == get_var(Mp4))
+    f = new MP4::File(filename);
 #endif
 #ifdef HAVE_ASF
-    else if (type == get_var(Mpeg))
-      f = new MPEG::File(filename);
+  else if (type == get_var(Mpeg))
+    f = new MPEG::File(filename);
 #endif
-    else
-     caml_raise_constant(*caml_named_value("taglib_exn_not_implemented"));
+  else {
+    free(filename);
+    caml_acquire_runtime_system();
+    caml_raise_constant(*caml_named_value("taglib_exn_not_implemented"));
+  }
+
+  free(filename);
+  caml_acquire_runtime_system();
 
   if (f == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
@@ -275,7 +293,14 @@ CAMLprim value caml_taglib_file_audioproperties(value f)
 CAMLprim value caml_taglib_file_save(value f)
 {
   CAMLparam1(f);
-  CAMLreturn(Val_bool(Taglib_file_val(f)->save()));
+
+  int ret;
+  
+  caml_release_runtime_system();
+  ret = Taglib_file_val(f)->save();
+  caml_acquire_runtime_system();
+
+  CAMLreturn(Val_bool(ret));
 }
 
 CAMLprim value caml_taglib_tag_get_string(value t, value name)

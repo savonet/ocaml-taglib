@@ -1,3 +1,8 @@
+0.3.1 ()
+=====
+* Wrapped file opening within caml_release_runtime_system()/caml_acquire_runtime_system()
+  calls to avoid deadlock when Taglib writes to stderr in daemon mode.
+
 0.3.0 (18-02-2013)
 =====
 * Added {set_}properties API.

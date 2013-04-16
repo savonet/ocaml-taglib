@@ -176,12 +176,10 @@ CAMLprim value caml_taglib_file_new(value type, value name)
   CAMLparam2(name,type);
 
   File *f = NULL;
-  char *filename = (char *)malloc(caml_string_length(name));
+  char *filename = strdup(String_val(name));
 
   if (filename == NULL)
     caml_raise_out_of_memory();
-
-  memcpy(filename, String_val(name), caml_string_length(name));
 
   caml_release_runtime_system();
 

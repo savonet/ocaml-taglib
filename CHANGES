@@ -1,4 +1,4 @@
-0.3.1 ()
+0.3.1 (08-05-2013)
 =====
 * Wrapped file opening within caml_release_runtime_system()/caml_acquire_runtime_system()
   calls to avoid deadlock when Taglib writes to stderr in daemon mode.

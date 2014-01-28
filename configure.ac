@@ -13,7 +13,11 @@ PKG_PROG_PKG_CONFIG()
 PKG_CONFIG_CHECK_MODULE([taglib],[1.6])
 
 # Need to add -lstdc++
-LIBS="$LIBS -lstdc++"
+LIBS="$LIBS stdc++"
+
+case "$host" in
+   *-mingw*) LIBS="$LIBS pthread gcc_s";
+esac
 
 # Now testing for recent classes:
 AC_CPP_CHECK_CLASS([tag],[tpropertymap.h],[TagLib::PropertyMap],[HAVE_PROPERTIES])

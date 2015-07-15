@@ -1,3 +1,7 @@
+0.3.2 ()
+=====
+* Raise Invalid_file instead of Not_found when TagLib open returns a NULL pointer
+
 0.3.1 (08-05-2013)
 =====
 * Wrapped file opening within caml_release_runtime_system()/caml_acquire_runtime_system()

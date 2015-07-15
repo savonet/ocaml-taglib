@@ -226,10 +226,7 @@ CAMLprim value caml_taglib_file_new(value type, value name)
   free(filename);
   caml_acquire_runtime_system();
 
-  if (f == NULL)
-    caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
-
-  if (!f->isValid()) {
+  if (!(f && f->isValid())) {
     delete f;
     caml_raise_constant(*caml_named_value("taglib_exn_invalid_file"));
   }

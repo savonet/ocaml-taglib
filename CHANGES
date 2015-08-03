@@ -1,4 +1,4 @@
-0.3.2 ()
+0.3.2 (03-08-2015)
 =====
 * Raise Invalid_file instead of Not_found when TagLib open returns a NULL pointer
 

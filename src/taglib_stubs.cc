@@ -393,6 +393,7 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
   char *caml_key;
   StringList *values;
   String *key;
+  unsigned char *tmp;
   int i,j;
   
   for (i = 0; i < Wosize_val(properties); i++) {
@@ -402,7 +403,8 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
     key = new String(caml_key, String::UTF8);
     values = new StringList();
     for (j = 0; j < Wosize_val(caml_values); j++) {
-      values->append(String_val(Field(caml_values,j)));
+      tmp = String_val(Field(caml_values,j));
+      values->append(new String(s, String::UTF8));
     }
 
     props.insert(*key, *values);

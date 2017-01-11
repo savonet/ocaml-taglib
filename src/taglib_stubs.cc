@@ -390,10 +390,9 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
   CAMLlocal1(caml_values);
   File *file = Taglib_file_val(f);
   PropertyMap props;
-  char *caml_key;
+  char *caml_key, *caml_val;
   StringList *values;
-  String *key;
-  unsigned char *tmp;
+  String *key, *val;
   int i,j;
   
   for (i = 0; i < Wosize_val(properties); i++) {
@@ -403,13 +402,15 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
     key = new String(caml_key, String::UTF8);
     values = new StringList();
     for (j = 0; j < Wosize_val(caml_values); j++) {
-      tmp = String_val(Field(caml_values,j));
-      values->append(new String(s, String::UTF8));
+      caml_val = String_val(Field(caml_values,j));
+      val = new String(caml_val, String::UTF8);
+      values->append(*val);
     }
 
     props.insert(*key, *values);
 
-    delete key, values;
+    delete key;
+    delete values;
   }
 
   // TODO: Catch this:

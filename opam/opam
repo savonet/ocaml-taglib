@@ -15,6 +15,7 @@ install: [
 remove: ["ocamlfind" "remove" "taglib"]
 depends: ["ocamlfind"]
 depexts: [
+ [["alpine"] ["taglib-dev"]]
  [["centos"] ["taglib-devel"]]
  [["debian"] ["libtag1-dev"]]
  [["ubuntu"] ["libtag1-dev"]]

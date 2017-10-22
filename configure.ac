@@ -20,9 +20,9 @@ AC_CPP_CHECK_CLASS([tag],[mp4file.h],[TagLib::MP4::File],[HAVE_MP4])
 AC_CPP_CHECK_CLASS([tag],[asffile.h],[TagLib::ASF::File],[HAVE_ASF])
 AC_CPP_CHECK_CLASS([tag],[trueaudiofile.h],[TagLib::TrueAudio::File],[HAVE_TRUEAUDIO])
 
-case "$host" in
-   *-mingw*) LIBS="$LIBS pthread gcc_s";
-esac
+if [[ "${TARGET_TOOLCHAIN}" = "mingw" ]]; then
+  LIBS="$LIBS pthread z";
+fi
 
 # Need to add -lstdc++
 LIBS="$LIBS stdc++"

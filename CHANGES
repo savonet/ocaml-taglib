@@ -1,3 +1,7 @@
+0.3.4 (12-10-2017)
+=====
+* Fix MXE/MinGW compilation.
+
 0.3.3 (11-04-2017)
 =====
 * Fix values string encoding in set_properties callback.

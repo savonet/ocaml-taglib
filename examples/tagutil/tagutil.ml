@@ -23,10 +23,10 @@ let gen_tag () =
 
 let strip_tag () =
   let buf = Buffer.create 1024 in
-  let tmp = String.create 1024 in
+  let tmp = Bytes.create 1024 in
   while Buffer.length buf < Taglib.Inline.Id3v2.header_size do
     let ret = input stdin tmp 0 Taglib.Inline.Id3v2.header_size in
-    Buffer.add_substring buf tmp 0 ret
+    Buffer.add_subbytes buf tmp 0 ret
   done;
   let tag_size =
     try
@@ -37,7 +37,7 @@ let strip_tag () =
   in
   while Buffer.length buf < tag_size do
     let ret = input stdin tmp 0 tag_size in
-    Buffer.add_substring buf tmp 0 ret
+    Buffer.add_subbytes buf tmp 0 ret
   done;
   let len = Buffer.length buf in
   output_string stdout (Buffer.sub buf tag_size (len-tag_size));
@@ -45,7 +45,7 @@ let strip_tag () =
      let ret = input stdin tmp 0 1024 in
      if ret > 0 then
       begin
-       output_string stdout (String.sub tmp 0 ret);
+       output_bytes stdout (Bytes.sub tmp 0 ret);
        f ()
       end
   in

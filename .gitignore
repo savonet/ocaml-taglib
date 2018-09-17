@@ -17,8 +17,10 @@ src/Makefile
 *.o
 *.so
 *.annot
+*.dll
 config.h
 config.h.in
 *~
 examples/properties/properties
+examples/tagutil/tagutil
 *.sw*

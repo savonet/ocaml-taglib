@@ -176,7 +176,13 @@ CAMLprim value caml_taglib_file_new(value type, value name)
   CAMLparam2(name,type);
 
   File *f = NULL;
+
+#ifdef WIN32
+  TagLib::String filename_str = TagLib::String(String_val(name), TagLib::String::UTF8);
+  const wchar_t *filename = filename_str.toCWString();
+#else
   char *filename = strdup(String_val(name));
+#endif
 
   if (filename == NULL)
     caml_raise_out_of_memory();
@@ -218,12 +224,16 @@ CAMLprim value caml_taglib_file_new(value type, value name)
     f = new MPEG::File(filename);
 #endif
   else {
+#ifndef WIN32
     free(filename);
+#endif
     caml_acquire_runtime_system();
     caml_raise_constant(*caml_named_value("taglib_exn_not_implemented"));
   }
 
+#ifndef WIN32
   free(filename);
+#endif
   caml_acquire_runtime_system();
 
   if (!(f && f->isValid())) {

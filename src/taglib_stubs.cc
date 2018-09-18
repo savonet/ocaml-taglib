@@ -90,11 +90,14 @@ using namespace TagLib;
 /* Declaring the functions which should be accessible on the C side. */
 extern "C"
 {
+#define CAML_INTERNALS
 #include <caml/alloc.h>
 #include <caml/callback.h>
 #include <caml/fail.h>
 #include <caml/memory.h>
 #include <caml/signals.h>
+#include <caml/misc.h>
+#include <caml/osdeps.h>
 
 /* Use new thread syntax in a backward fashion. */
 #define caml_acquire_runtime_system caml_leave_blocking_section
@@ -178,8 +181,7 @@ CAMLprim value caml_taglib_file_new(value type, value name)
   File *f = NULL;
 
 #ifdef WIN32
-  TagLib::String filename_str = TagLib::String(String_val(name), TagLib::String::UTF8);
-  const wchar_t *filename = filename_str.toCWString();
+  const wchar_t *filename = caml_stat_strdup_to_os(String_val(name));
 #else
   char *filename = strdup(String_val(name));
 #endif
@@ -224,16 +226,12 @@ CAMLprim value caml_taglib_file_new(value type, value name)
     f = new MPEG::File(filename);
 #endif
   else {
-#ifndef WIN32
     free(filename);
-#endif
     caml_acquire_runtime_system();
     caml_raise_constant(*caml_named_value("taglib_exn_not_implemented"));
   }
 
-#ifndef WIN32
   free(filename);
-#endif
   caml_acquire_runtime_system();
 
   if (!(f && f->isValid())) {

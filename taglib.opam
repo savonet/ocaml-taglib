@@ -1,0 +1,26 @@
+opam-version: "2.0"
+version: "dev"
+maintainer: "Romain Beauxis <toots@rastageeks.org>"
+authors: "The Savonet Team <savonet-users@lists.sourceforge.net>"
+homepage: "https://github.com/savonet/ocaml-taglib"
+bug-reports: "https://github.com/savonet/ocaml-taglib/issues"
+depends: ["ocaml" "ocamlfind"]
+flags: light-uninstall
+build: [
+  ["./bootstrap"]
+  ["./configure" "--prefix" prefix]
+  [make clean]
+  [make]
+]
+install: [make "install"]
+remove: ["ocamlfind" "remove" "taglib"]
+depexts: [
+  ["taglib-dev"] {os-distribution = "alpine"}
+  ["gcc-c++" "taglib-devel"] {os-distribution = "opensuse"}
+  ["gcc-c++" "taglib-devel"] {os-distribution = "fedora"}
+  ["gcc-c++" "taglib-devel"] {os-distribution = "centos"}
+  ["libtag1-dev"] {os-distribution = "debian"}
+  ["libtag1-dev"] {os-distribution = "ubuntu"}
+  ["taglib"] {os = "macos" & os-distribution = "homebrew"}
+]
+dev-repo: "git+https://github.com/savonet/ocaml-taglib.git"

@@ -97,7 +97,9 @@ extern "C"
 #include <caml/memory.h>
 #include <caml/signals.h>
 #include <caml/misc.h>
+#ifdef WIN32
 #include <caml/osdeps.h>
+#endif
 
 /* Use new thread syntax in a backward fashion. */
 #define caml_acquire_runtime_system caml_leave_blocking_section

@@ -276,9 +276,9 @@ struct
       parse_tag (grab_tag t) h ;
       t
    
-    external render : tag -> string = "caml_taglib_id3v2_render"
+    external render : tag -> bytes = "caml_taglib_id3v2_render"
 
-    let render t = render (grab_tag t)
+    let render t = Bytes.to_string (render (grab_tag t))
 
     external attach_frame : tag -> string -> string -> unit = "caml_taglib_id3v2_attach_frame"
 

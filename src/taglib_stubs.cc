@@ -313,7 +313,7 @@ CAMLprim value caml_taglib_tag_get_string(value t, value name)
   CAMLparam2(t,name);
   CAMLlocal1(ans);
   const Tag *tag = Taglib_tag_val(t) ;
-  char *s = String_val(name);
+  const char *s = String_val(name);
   String tmp = String::null;
 
   if (!strcmp(s,"title"))
@@ -340,7 +340,7 @@ CAMLprim value caml_taglib_tag_get_int(value t, value name)
 {
   CAMLparam2(t,name);
   const Tag *tag = Taglib_tag_val(t) ;
-  char *s = String_val(name);
+  const char *s = String_val(name);
   int tmp;
 
     if (!strcmp(s,"year"))
@@ -400,7 +400,7 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
   CAMLlocal1(caml_values);
   File *file = Taglib_file_val(f);
   PropertyMap props;
-  char *caml_key, *caml_val;
+  const char *caml_key, *caml_val;
   StringList *values;
   String *key, *val;
   int i,j;
@@ -441,7 +441,7 @@ CAMLprim value caml_taglib_tag_set_string(value t, value name, value v)
 {
   CAMLparam3(t,name, v);
   Tag *tag = Taglib_tag_val(t) ;
-  char *s = String_val(name);
+  const char *s = String_val(name);
   const char *x = String_val(v) ;
 
     if (!strcmp(s,"title"))
@@ -464,7 +464,7 @@ CAMLprim value caml_taglib_tag_set_int(value t, value name, value v)
 {
   CAMLparam3(t,name, v);
   Tag *tag = Taglib_tag_val(t) ;
-  char *s = String_val(name);
+  const char *s = String_val(name);
   int x = Int_val(v) ;
 
     if (!strcmp(s,"year"))
@@ -481,7 +481,7 @@ CAMLprim value caml_taglib_audioproperties_get_int(value p, value name)
 {
   CAMLparam2(p,name);
   const AudioProperties *prop = Taglib_audioproperties_val(p) ;
-  char *s = String_val(name);
+  const char *s = String_val(name);
   int tmp;
 
     if (!strcmp(s,"length"))
@@ -564,7 +564,7 @@ CAMLprim value caml_taglib_id3v2_parse_tag(value t, value h)
 {
   CAMLparam2(t,h);
   myId3v2 *tag = Id3v2_tag_val(t);
-  char *s = String_val(h);
+  const char *s = String_val(h);
   TagLib::uint size = ID3v2::Header::size();
 
   tag->doParse(ByteVector(s+size,caml_string_length(h)-size));
@@ -579,7 +579,7 @@ CAMLprim value caml_taglib_id3v2_render(value t)
   ByteVector r = tag->render();
 
   ret = caml_alloc_string(r.size());
-  memcpy(String_val(ret),r.data(),r.size());
+  memcpy(Bytes_val(ret),r.data(),r.size());
 
   CAMLreturn(ret);
 }

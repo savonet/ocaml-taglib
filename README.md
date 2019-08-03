@@ -10,9 +10,7 @@ Prerequisites
 --------------
 
 * ocaml >= 4.00.1
-
 * Taglib >= 1.8
-
 * findlib >= 1.3.3
 
 Compilation

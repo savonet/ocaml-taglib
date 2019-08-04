@@ -1,5 +1,5 @@
 PROGNAME := ocaml-taglib
-DISTFILES := @AUTOCONF_INSTALL_FILES@ CHANGES COPYING Makefile.in README \
+DISTFILES := @AUTOCONF_INSTALL_FILES@ CHANGES COPYING Makefile.in README.md \
 	bootstrap configure configure.ac  config.h.in \
 	src/*.ml src/*.mli src/*.cc src/Makefile.in src/META.in \
 	src/OCamlMakefile \

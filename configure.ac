@@ -5,6 +5,27 @@ AC_MSG_RESULT([configuring $PACKAGE_STRING])
 
 AC_BASE_CHECKS()
 
+min_ocaml_version=4.02.0
+
+OCAML_VERSION="`$OCAMLC -version`"
+OCAML_MAJOR="`echo $OCAML_VERSION | cut -d'.' -f 1`"
+AC_SUBST(OCAML_MAJOR)
+OCAML_MINOR="`echo $OCAML_VERSION | cut -d'.' -f 2`"
+AC_SUBST(OCAML_MINOR)
+OCAML_REVISION="`echo $OCAML_VERSION | cut -d'.' -f 3`"
+AC_SUBST(OCAML_REVISION)
+AC_MSG_CHECKING([for ocamlc version])
+AC_MSG_RESULT([$OCAML_MAJOR.$OCAML_MINOR.$OCAML_REVISION])
+
+AS_VERSION_COMPARE([$OCAML_MAJOR.$OCAML_MINOR.$OCAML_REVISION],[$min_ocaml_version],
+  [VERSION_OK=],
+  [VERSION_OK=yes],
+  [VERSION_OK=yes]
+)
+if test -z "${VERSION_OK}"; then
+  AC_MSG_ERROR([version $min_ocaml_version or greater of the OCaml compiler is required to build liquidsoap])
+fi
+
 AC_PROG_CXX()
 AC_CONFIG_HEADERS([config.h])
 CPPFLAGS="$CPPFLAGS -I .."

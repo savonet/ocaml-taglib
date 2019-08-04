@@ -1,6 +1,8 @@
 0.3.6 ()
 =====
 * Use OCaml conversion functions for filename on windows platforms.
+* Make taglib safe-string compatible
+* Bump minimum OCaml version.
 
 0.3.5 (17-09-2018)
 =====

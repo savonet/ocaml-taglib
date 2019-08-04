@@ -9,7 +9,7 @@ Please read the COPYING file before using this software.
 Prerequisites
 --------------
 
-* ocaml >= 4.00.1
+* ocaml >= 4.02.0
 * Taglib >= 1.8
 * findlib >= 1.3.3
 

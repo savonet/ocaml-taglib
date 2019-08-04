@@ -21,9 +21,9 @@ AC_DEFUN([AC_PROG_OCAML],
 
   OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version* *\(.*\)$|\1|p'`
   AC_MSG_RESULT([OCaml version is $OCAMLVERSION])
-  # Check if version is >= 4.06.0
+  # Check if version is >= 4.02.0
   AC_MSG_CHECKING([if ocaml compiler supports first-class modules])
-  AS_VERSION_COMPARE([$OCAMLVERSION],[4.06.0],[],[OCAML_HAS_FIRST_CLASS_MODULES="yes"],[OCAML_HAS_FIRST_CLASS_MODULES="yes"])
+  AS_VERSION_COMPARE([$OCAMLVERSION],[4.02.0],[],[OCAML_HAS_FIRST_CLASS_MODULES="yes"],[OCAML_HAS_FIRST_CLASS_MODULES="yes"])
   if test -n "${OCAML_HAS_FIRST_CLASS_MODULES}"; then
     AC_MSG_RESULT([yes])
   else

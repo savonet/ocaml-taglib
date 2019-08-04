@@ -579,8 +579,11 @@ CAMLprim value caml_taglib_id3v2_render(value t)
   ByteVector r = tag->render();
 
   ret = caml_alloc_string(r.size());
+#ifdef CAML_SAFE_STRING
   memcpy(Bytes_val(ret),r.data(),r.size());
-
+#else
+  memcpy(String_val(ret),r.data(),r.size());
+#endif
   CAMLreturn(ret);
 }
 

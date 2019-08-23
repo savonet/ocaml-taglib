@@ -1,6 +1,0 @@
-name="taglib"
-version="@VERSION@"
-description="OCaml bindings for taglib"
-requires="unix @requires@"
-archive(byte)="taglib.cma"
-archive(native)="taglib.cmxa"

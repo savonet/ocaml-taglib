@@ -9,17 +9,13 @@ synopsis:
   "Bindings for the taglib library which provides functions for reading tags in headers of audio files"
 depends: [
   "ocaml" {>= "4.02.0"}
-  "ocamlfind" {build}
-  "conf-pkg-config" {build}
+  "dune"
 ]
 build: [
-  ["./bootstrap"] {dev}
-  ["./configure" "--prefix" prefix]
-  [make "clean"] {dev}
-  [make]
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
-install: [make "install"]
-remove: ["ocamlfind" "remove" "taglib"]
 depexts: [
   ["taglib-dev"] {os-distribution = "alpine"}
   ["gcc-c++" "taglib-devel"] {os-family = "suse"}

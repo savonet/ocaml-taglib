@@ -69,7 +69,8 @@ struct
       audioproperties : audioproperties;
       tag : tag }
        constraint 'a = [< file_type]
-  (** Type for a file. *)
+
+ (** Type for a file. *)
   type 'a file_tag = 'a fileref option ref
   type 'a file = 'a file_tag t
 

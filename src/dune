@@ -1,8 +1,8 @@
 (library
  (name            taglib)
  (public_name     taglib)
- (c_names         taglib_stubs)
- (c_flags         (:include c_flags.sexp))
+ (cxx_names       taglib_stubs)
+ (cxx_flags       (:include c_flags.sexp))
  (c_library_flags (:include c_library_flags.sexp)))
 
 (rule

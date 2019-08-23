@@ -4,7 +4,7 @@ let () =
 C.main ~name:"taglib-pkg-config" (fun c ->
 let default : C.Pkg_config.package_conf =
   { libs   = ["-ltaglib"]
-  ; cflags = []
+  ; cflags = ["-fPIC"]
   }
 in
 let conf =
@@ -13,7 +13,7 @@ let conf =
   | Some pc ->
      match (C.Pkg_config.query pc ~package:"taglib") with
      | None -> default
-     | Some deps -> deps
+     | Some deps -> { deps with cflags = "-fPIC"::deps.cflags }
 in
 
 

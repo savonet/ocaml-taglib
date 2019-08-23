@@ -1,0 +1,4 @@
+(alias
+ (name examples)
+ (deps
+  (:< properties/properties.exe tagutil/tagutil.exe)))

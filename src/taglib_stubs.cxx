@@ -38,13 +38,14 @@
  * @author Romain Beauxis
  */
 
-//#include <config.h>
+#include "config.h"
+
 #include <stdlib.h>
 
 #include <fileref.h>
 #include <tfile.h>
 
-#ifdef HAVE_ASF
+#ifdef HAS_ASF
 #include <asffile.h>
 #endif
 
@@ -53,27 +54,27 @@
 #include <flacfile.h>
 #include <oggflacfile.h>
 
-#ifdef HAVE_MP4
+#ifdef HAS_MP4
 #include <mp4file.h>
 #endif
 
-#ifdef HAVE_MPC
+#ifdef HAS_MPC
 #include <mpcfile.h>
 #endif
 
-#ifdef HAVE_WAVPACK
+#ifdef HAS_WAVPACK
 #include <wavpackfile.h>
 #endif
 
-#ifdef HAVE_SPEEX
+#ifdef HAS_SPEEX
 #include <speexfile.h>
 #endif
 
-#ifdef HAVE_TRUEAUDIO
+#ifdef HAS_TRUEAUDIO
 #include <trueaudiofile.h>
 #endif
 
-#ifdef HAVE_PROPERTIES
+#ifdef HAS_PROPERTIES
 #include <tpropertymap.h>
 #else
 #include <stdio.h>
@@ -201,29 +202,29 @@ CAMLprim value caml_taglib_file_new(value type, value name)
     f = new Ogg::Vorbis::File(filename);
   else if (type == get_var(Flac))
     f = new FLAC::File(filename);
-#ifdef HAVE_MPC
+#ifdef HAS_MPC
   else if (type == get_var(Mpc))
     f = new MPC::File(filename);
 #endif
   else if (type == get_var(OggFlac))
     f = new Ogg::FLAC::File(filename);
-#ifdef HAVE_WAVPACK
+#ifdef HAS_WAVPACK
   else if (type == get_var(WavPack))
     f = new MPEG::File(filename);
 #endif
-#ifdef HAVE_SPEEX
+#ifdef HAS_SPEEX
   else if (type == get_var(Speex))
     f = new Ogg::Speex::File(filename);
 #endif
-#ifdef HAVE_TRUEAUDIO
+#ifdef HAS_TRUEAUDIO
   else if (type == get_var(TrueAudio))
     f = new TrueAudio::File(filename);
 #endif
-#ifdef HAVE_MP4
+#ifdef HAS_MP4
   else if (type == get_var(Mp4))
     f = new MP4::File(filename);
 #endif
-#ifdef HAVE_ASF
+#ifdef HAS_ASF
   else if (type == get_var(Mpeg))
     f = new MPEG::File(filename);
 #endif
@@ -361,7 +362,7 @@ CAMLprim value caml_taglib_file_get_properties(value f, value fn)
   CAMLparam2(f, fn);
   File *file = Taglib_file_val(f) ;
 
-#ifdef HAVE_PROPERTIES
+#ifdef HAS_PROPERTIES
   PropertyMap props = file->properties();
   PropertyMap::Iterator i;
   StringList l;
@@ -396,7 +397,7 @@ CAMLprim value caml_taglib_file_set_properties(value f, value properties)
 {
   CAMLparam2(f, properties);
 
-#ifdef HAVE_PROPERTIES
+#ifdef HAS_PROPERTIES
   CAMLlocal1(caml_values);
   File *file = Taglib_file_val(f);
   PropertyMap props;

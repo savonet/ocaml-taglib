@@ -52,60 +52,46 @@ val version : string
 (** {2 Generic tag interface } *)
 
 val tag_title : 'a t -> string
-
 val tag_artist : 'a t -> string
-
 val tag_album : 'a t -> string
-
 val tag_comment : 'a t -> string
-
 val tag_genre : 'a t -> string
-
 val tag_year : 'a t -> int
-
 val tag_track : 'a t -> int
 
 (** {2 Set tag interface } *)
 
 val tag_set_title : 'a t -> string -> unit
-
 val tag_set_artist : 'a t -> string -> unit
-
 val tag_set_album : 'a t -> string -> unit
-
 val tag_set_comment : 'a t -> string -> unit
-
 val tag_set_genre : 'a t -> string -> unit
-
 val tag_set_year : 'a t -> int -> unit
-
 val tag_set_track : 'a t -> int -> unit
 
 (** {2 File interface } *)
 
-module File :
-sig
+module File : sig
   (** Supported file types. Warning, types: [WavPack],
     * [Speex] and [TrueAudio] are only supported in
     * Taglib >= 1.5.
     * Types: [Mp4], [Asf] are only supported with
     * Taglib >= 1.6. *)
   type file_type =
-    [ `Autodetect |
-      `Mpeg |
-      `OggVorbis |
-      `Flac |
-      `Mpc |
-      `OggFlac |
-      `WavPack |
-      `Speex |
-      `TrueAudio |
-      `Mp4 |
-      `Asf ]
+    [ `Autodetect
+    | `Mpeg
+    | `OggVorbis
+    | `Flac
+    | `Mpc
+    | `OggFlac
+    | `WavPack
+    | `Speex
+    | `TrueAudio
+    | `Mp4
+    | `Asf ]
 
   (** Type for a file. *)
-  type 'a file_tag
-    constraint 'a = [< file_type]
+  type 'a file_tag constraint 'a = [< file_type ]
 
   type 'a file = 'a file_tag t
 
@@ -129,23 +115,16 @@ sig
   val open_file : file_type -> string -> file_type file
 
   val close_file : file_type file -> unit
-
   val file_save : file_type file -> bool
-
   val file_type : file_type file -> file_type
-
   val properties : file_type file -> (string, string list) Hashtbl.t
-
   val set_properties : file_type file -> (string, string list) Hashtbl.t -> unit
 
   (** {2 Get audio properties interface } *)
 
   val audioproperties_length : file_type file -> int
-
   val audioproperties_bitrate : file_type file -> int
-
   val audioproperties_samplerate : file_type file -> int
-
   val audioproperties_channels : file_type file -> int
 end
 
@@ -153,8 +132,7 @@ end
 
 (** This module provides an API to manipulate tags not
   * attached to a file. *)
-module Inline :
-sig
+module Inline : sig
   (** Parse and generate id3v2 binary tags. 
     *
     * This module provides ways to manipulate id3v2 tags
@@ -169,8 +147,7 @@ sig
     * common [tag_title], ... API. 
     *
     * See [examples/tagutil.ml] for an example of the use of this module. *)
-  module Id3v2 : 
-  sig
+  module Id3v2 : sig
     (** State of the tag. This is used to enforce validity of 
       * the generated tag. 
       * 
@@ -178,9 +155,7 @@ sig
       * at least one frame has been added to it. *)
     type state = [ `Invalid | `Parsed | `Valid ]
 
-    type 'a id3v2_tag
-      constraint 'a = [< state]
-
+    type 'a id3v2_tag constraint 'a = [< state ]
     type 'a id3v2 = 'a id3v2_tag t
 
     (** A frame type is the id3v2 identifier, e.g. TIT2, TALB, ... *)
@@ -189,38 +164,42 @@ sig
     (** Text content of a frame. *)
     type frame_text = string
 
-    val init : unit -> [`Invalid] id3v2
-
+    val init : unit -> [ `Invalid ] id3v2
     val header_size : int
+    val parse_header : [ `Invalid ] id3v2 -> string -> [ `Parsed ] id3v2
+    val tag_size : [< `Parsed | `Valid ] id3v2 -> int
+    val parse_tag : [ `Parsed ] id3v2 -> string -> [ `Valid ] id3v2
 
-    val parse_header : [`Invalid] id3v2 -> string -> [`Parsed] id3v2
+    val attach_frame :
+      [< `Invalid | `Valid ] id3v2 ->
+      frame_type ->
+      frame_text ->
+      [ `Valid ] id3v2
 
-    val tag_size : [< `Parsed | `Valid] id3v2 -> int
-
-    val parse_tag : [`Parsed] id3v2 -> string -> [`Valid] id3v2
-
-    val attach_frame : [< `Invalid | `Valid ] id3v2 -> frame_type -> frame_text -> [`Valid] id3v2
-
-    val render : [`Valid] id3v2 -> string
+    val render : [ `Valid ] id3v2 -> string
 
     (** {2 Generic set functions} *)
-    
+
     (** These functions perform the same operations as their counter-part from [Taglib]. 
       * The only difference here is that they return a valid tag. *)
 
-    val tag_set_title : [< `Invalid | `Valid ] id3v2 -> string -> [`Valid] id3v2
+    val tag_set_title :
+      [< `Invalid | `Valid ] id3v2 -> string -> [ `Valid ] id3v2
 
-    val tag_set_artist : [< `Invalid | `Valid ] id3v2 -> string -> [`Valid] id3v2
+    val tag_set_artist :
+      [< `Invalid | `Valid ] id3v2 -> string -> [ `Valid ] id3v2
 
-    val tag_set_album : [< `Invalid | `Valid ] id3v2 -> string -> [`Valid] id3v2
+    val tag_set_album :
+      [< `Invalid | `Valid ] id3v2 -> string -> [ `Valid ] id3v2
 
-    val tag_set_comment : [< `Invalid | `Valid ] id3v2 -> string -> [`Valid] id3v2
+    val tag_set_comment :
+      [< `Invalid | `Valid ] id3v2 -> string -> [ `Valid ] id3v2
 
-    val tag_set_genre : [< `Invalid | `Valid ] id3v2 -> string -> [`Valid] id3v2
+    val tag_set_genre :
+      [< `Invalid | `Valid ] id3v2 -> string -> [ `Valid ] id3v2
 
-    val tag_set_year : [< `Invalid | `Valid ] id3v2 -> int -> [`Valid] id3v2
-
-    val tag_set_track : [< `Invalid | `Valid ] id3v2 -> int -> [`Valid] id3v2
+    val tag_set_year : [< `Invalid | `Valid ] id3v2 -> int -> [ `Valid ] id3v2
+    val tag_set_track : [< `Invalid | `Valid ] id3v2 -> int -> [ `Valid ] id3v2
   end
 end
 
@@ -230,16 +209,16 @@ end
   * may be removed at any time. *)
 
 type file_type =
-       Mpeg |
-       OggVorbis |
-       Flac |
-       Mpc |
-       OggFlac |
-       WavPack |
-       Speex |
-       TrueAudio |
-       Mp4 |
-       Asf
+  | Mpeg
+  | OggVorbis
+  | Flac
+  | Mpc
+  | OggFlac
+  | WavPack
+  | Speex
+  | TrueAudio
+  | Mp4
+  | Asf
 
 exception Closed
 exception Not_implemented
@@ -248,16 +227,9 @@ exception Not_implemented
 val set_strings_unicode : bool -> unit
 
 val open_file : ?file_type:file_type -> string -> File.file_type File.file
-
 val audioproperties_length : File.file_type File.file -> int
-
 val audioproperties_bitrate : File.file_type File.file -> int
-
 val audioproperties_samplerate : File.file_type File.file -> int
-
 val audioproperties_channels : File.file_type File.file -> int
-
 val close_file : File.file_type File.file -> unit
-
 val file_save : File.file_type File.file -> bool
-

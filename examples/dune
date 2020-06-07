@@ -1,0 +1,9 @@
+(executable
+ (name properties)
+ (modules properties)
+ (libraries taglib))
+
+(executable
+ (name tagutil)
+ (modules tagutil)
+ (libraries taglib))

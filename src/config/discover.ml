@@ -14,7 +14,7 @@ int main()
 let () =
   C.main ~name:"taglib-pkg-config" (fun c ->
       let default : C.Pkg_config.package_conf =
-        { libs = ["-ltaglib"; "-lstdc++"]; cflags = ["-fPIC"] }
+        { libs = ["-ltaglib"]; cflags = [] }
       in
       let conf =
         match C.Pkg_config.get c with

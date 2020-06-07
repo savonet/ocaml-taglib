@@ -34,5 +34,5 @@ depexts: [
   ["gcc-c++" "taglib-devel"] {os-distribution = "fedora"}
   ["gcc-c++" "taglib-devel"] {os-distribution = "centos"}
   ["libtag1-dev"] {os-family = "debian"}
-  ["taglib"] {os = "macos" & os-distribution = "homebrew"}
+  ["pkg-config" "taglib"] {os = "macos" & os-distribution = "homebrew"}
 ]

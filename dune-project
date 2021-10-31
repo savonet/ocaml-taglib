@@ -1,8 +1,8 @@
-(lang dune 2.0)
+(lang dune 2.7)
 (version 0.3.7)
 (name taglib)
 (source (github savonet/ocaml-taglib))
-(license LGPL+link-exception)
+(license "LGPL-2.1-only WITH OCaml-LGPL-linking-exception")
 (authors "The Savonet Team <savonet-users@lists.sourceforge.net>")
 (maintainers "The Savonet Team <savonet-users@lists.sourceforge.net>")
 
@@ -13,6 +13,7 @@
  (synopsis "Bindings for the taglib library")
  (description "Bindings for the taglib library which provides functions for reading tags in headers of audio files")
  (depends
-  (dune (> 2.0))
+  dune
+  conf-taglib
   dune-configurator)
 )

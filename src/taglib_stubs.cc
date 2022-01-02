@@ -180,7 +180,7 @@ CAMLprim value caml_taglib_file_new(value type, value name) {
   File *f = NULL;
 
 #ifdef WIN32
-  const wchar_t *filename = caml_stat_strdup_to_os(String_val(name));
+  wchar_t *filename = caml_stat_strdup_to_os(String_val(name));
 #else
   char *filename = strdup(String_val(name));
 #endif

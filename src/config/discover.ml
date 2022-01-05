@@ -25,7 +25,7 @@ let () =
                   ~expr:"taglib >= 1.6"
               with
                 | Error msg -> failwith msg
-                | Ok deps -> deps )
+                | Ok deps -> deps)
       in
       C.Flags.write_sexp "c_flags.sexp" ("-fPIC" :: conf.cflags);
       C.Flags.write_sexp "c_library_flags.sexp" ("-lstdc++" :: conf.libs);

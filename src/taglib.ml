@@ -307,7 +307,7 @@ let open_file ?file_type f =
           | Speex -> f `Speex
           | TrueAudio -> f `TrueAudio
           | Mp4 -> f `Mp4
-          | Asf -> f `Asf )
+          | Asf -> f `Asf)
 
 let w f t =
   try f t with

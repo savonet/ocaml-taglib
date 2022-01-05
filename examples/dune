@@ -9,8 +9,17 @@
  (libraries taglib))
 
 (rule
-  (target test.mp3)
-  (action (run ffmpeg -f lavfi -i sine=frequency=1000:duration=5 -metadata title=ocaml_taglib_test %{target})))
+ (target test.mp3)
+ (action
+  (run
+   ffmpeg
+   -f
+   lavfi
+   -i
+   sine=frequency=1000:duration=5
+   -metadata
+   title=ocaml_taglib_test
+   %{target})))
 
 (rule
  (alias runtest)
@@ -19,6 +28,4 @@
   (:mp3 test.mp3)
   (:properties ./properties.exe))
  (action
-  (system "./%{properties} %{mp3} | grep ocaml_taglib_test")
- )
-)
+  (system "./%{properties} %{mp3} | grep ocaml_taglib_test")))

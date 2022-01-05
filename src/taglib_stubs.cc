@@ -311,7 +311,7 @@ CAMLprim value caml_taglib_tag_get_string(value t, value name) {
   CAMLlocal1(ans);
   const Tag *tag = Taglib_tag_val(t);
   const char *s = String_val(name);
-  String tmp = String::null;
+  String tmp = "";
 
   if (!strcmp(s, "title"))
     tmp = tag->title();
@@ -326,7 +326,7 @@ CAMLprim value caml_taglib_tag_get_string(value t, value name) {
   else
     caml_failwith("Invalid value");
 
-  if (tmp == String::null)
+  if (tmp.isEmpty())
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
 
   ans = caml_copy_string(tmp.toCString(bool(true)));

@@ -11,6 +11,7 @@ homepage: "https://github.com/savonet/ocaml-taglib"
 bug-reports: "https://github.com/savonet/ocaml-taglib/issues"
 depends: [
   "dune" {>= "2.8"}
+  "ocaml" {>= "4.07"}
   "conf-taglib"
   "dune-configurator"
   "odoc" {with-doc}

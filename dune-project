@@ -15,6 +15,7 @@
  (description "Bindings for the taglib library which provides functions for reading tags in headers of audio files")
  (depends
   dune
+  (ocaml (>= 4.07))
   conf-taglib
   dune-configurator)
 )

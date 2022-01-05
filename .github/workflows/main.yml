@@ -6,12 +6,10 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest, macos-latest]
-        ocaml-version: ['4.09.0']
     steps:
-    - uses: actions/checkout@v1
-    - uses: avsm/setup-ocaml@master
-      with:
-        ocaml-version: ${{ matrix.ocaml-version }}
-    - run: opam pin add -n .
-    - run: opam depext -yt taglib
-    - run: opam install -t .
+    - name: Checkout latest code
+      uses: actions/checkout@v1
+    - name: Install ocaml
+      uses: ocaml/setup-ocaml@v2
+    - name: Install module
+      run: opam install --cli=2.1 --with-test --confirm-level=unsafe-yes .

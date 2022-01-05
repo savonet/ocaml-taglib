@@ -1,3 +1,7 @@
+0.3.7 (04-01-2022)
+=====
+* Get rid of naked pointers.
+
 0.3.7 (31-10-2021) 🎃
 =====
 * Switched to dune

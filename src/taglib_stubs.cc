@@ -170,12 +170,35 @@ CAMLprim value caml_taglib_init(value unit) {
   CAMLreturn(Val_unit);
 }
 
-#define Taglib_file_val(v) ((File *)v)
-#define Taglib_tag_val(v) (*((Tag **)Data_custom_val(v)))
-#define Taglib_audioproperties_val(v) ((AudioProperties *)v)
+#define Taglib_file_val(v) (*((File **)Data_abstract_val(v)))
+
+static inline value value_of_taglib_file(value v, File *f) {
+  v = caml_alloc(1, Abstract_tag);
+  *((File **)Data_abstract_val(v)) = f;
+  return v;
+}
+
+#define Taglib_tag_val(v) (*((Tag **)Data_abstract_val(v)))
+
+static inline value value_of_taglib_tag(value v, Tag *f) {
+  v = caml_alloc(1, Abstract_tag);
+  *((Tag **)Data_abstract_val(v)) = f;
+  return v;
+}
+
+#define Taglib_audioproperties_val(v)                                          \
+  (*((AudioProperties **)Data_abstract_val(v)))
+
+static inline value value_of_taglib_audioproperties(value v,
+                                                    AudioProperties *f) {
+  v = caml_alloc(1, Abstract_tag);
+  *((AudioProperties **)Data_abstract_val(v)) = f;
+  return v;
+}
 
 CAMLprim value caml_taglib_file_new(value type, value name) {
   CAMLparam2(name, type);
+  CAMLlocal1(ret);
 
   File *f = NULL;
 
@@ -238,7 +261,7 @@ CAMLprim value caml_taglib_file_new(value type, value name) {
     caml_raise_constant(*caml_named_value("taglib_exn_invalid_file"));
   }
 
-  CAMLreturn((value)f);
+  CAMLreturn(value_of_taglib_file(ret, f));
 }
 
 CAMLprim value caml_taglib_file_free(value f) {
@@ -249,14 +272,6 @@ CAMLprim value caml_taglib_file_free(value f) {
   CAMLreturn(Val_unit);
 }
 
-/* Do nothing file file tags. */
-static void finalize_file_tag(value t) { return; }
-
-static struct custom_operations file_tag_ops = {
-    (char *)"ocaml_taglib_file_tag", finalize_file_tag,
-    custom_compare_default,          custom_hash_default,
-    custom_serialize_default,        custom_deserialize_default};
-
 CAMLprim value caml_taglib_file_tag(value f) {
   CAMLparam1(f);
   CAMLlocal1(ret);
@@ -265,20 +280,18 @@ CAMLprim value caml_taglib_file_tag(value f) {
   if (t == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
 
-  ret = caml_alloc_custom(&file_tag_ops, sizeof(Tag *), 1, 0);
-  Taglib_tag_val(ret) = t;
-
-  CAMLreturn(ret);
+  CAMLreturn(value_of_taglib_tag(ret, t));
 }
 
 CAMLprim value caml_taglib_file_audioproperties(value f) {
   CAMLparam1(f);
+  CAMLlocal1(ret);
   AudioProperties *p = Taglib_file_val(f)->audioProperties();
 
   if (p == NULL)
     caml_raise_constant(*caml_named_value("taglib_exn_not_found"));
 
-  CAMLreturn((value)p);
+  CAMLreturn(value_of_taglib_audioproperties(ret, p));
 }
 
 CAMLprim value caml_taglib_file_save(value f) {

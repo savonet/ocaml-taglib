@@ -65,16 +65,14 @@ module File = struct
 
   type 'a fileref = {
     file_type : 'a;
-    taglib_file : taglib_file;
-    audioproperties : audioproperties;
-    tag : tag;
+    mutable taglib_file : taglib_file option;
   }
     constraint 'a = [< file_type ]
 
   (** Type for a file. *)
-  type 'a file_tag = 'a fileref option ref
+  type 'a file_tag = 'a fileref
 
-  type 'a file = 'a file_tag t
+  type 'a file = 'a fileref t
 
   exception Invalid_file
   exception Closed
@@ -90,24 +88,28 @@ module File = struct
   external close_file : taglib_file -> unit = "caml_taglib_file_free"
 
   let close_file (d, _) =
-    match !d with
-      | None -> ()
-      | Some f ->
-          close_file f.taglib_file;
-          d := None
+    match d with
+      | { taglib_file = None; _ } -> ()
+      | { taglib_file = Some f; _ } ->
+          close_file f;
+          d.taglib_file <- None
 
   external file_tag : taglib_file -> tag = "caml_taglib_file_tag"
 
   external file_audioproperties : taglib_file -> audioproperties
     = "caml_taglib_file_audioproperties"
 
+  let get_taglib_file f =
+    match f with
+      | { taglib_file = None; _ } -> raise Closed
+      | { taglib_file = Some f; _ } -> f
+
   external file_save : taglib_file -> bool = "caml_taglib_file_save"
 
-  let file_save (d, _) =
-    match !d with None -> raise Closed | Some f -> file_save f.taglib_file
+  let file_save (f, _) = file_save (get_taglib_file f)
 
-  let file_type (f, _) =
-    match !f with None -> raise Closed | Some f -> f.file_type
+  let file_type (d, _) =
+    match d with { taglib_file = None; _ } -> raise Closed | _ -> d.file_type
 
   let open_file file_type name =
     (* Test whether file exist to avoid library issue.
@@ -116,18 +118,18 @@ module File = struct
       try ignore (Unix.stat name) with _ -> raise Not_found
     end;
     let f = open_file file_type name in
-    let tag = file_tag f in
-    let prop = file_audioproperties f in
-    let file =
-      ref (Some { taglib_file = f; file_type; audioproperties = prop; tag })
-    in
-    (file, fun f -> match !f with None -> raise Closed | Some f -> f.tag)
+    let file = { taglib_file = Some f; file_type } in
+    ( file,
+      fun f ->
+        match f with
+          | { taglib_file = None; _ } -> raise Closed
+          | { taglib_file = Some f; _ } -> file_tag f )
 
   external properties : taglib_file -> (string -> string -> unit) -> unit
     = "caml_taglib_file_get_properties"
 
   let properties (f, _) =
-    let f = match !f with None -> raise Closed | Some f -> f.taglib_file in
+    let f = get_taglib_file f in
     let props = Hashtbl.create 5 in
     let fn key value =
       let values = try Hashtbl.find props key with Not_found -> [] in
@@ -140,7 +142,7 @@ module File = struct
     = "caml_taglib_file_set_properties"
 
   let set_properties (f, _) props =
-    let f = match !f with None -> raise Closed | Some f -> f.taglib_file in
+    let f = get_taglib_file f in
     let props =
       Hashtbl.fold
         (fun key values props -> (key, Array.of_list values) :: props)
@@ -152,9 +154,8 @@ module File = struct
     = "caml_taglib_audioproperties_get_int"
 
   let audioproperties_get_int (f, _) s =
-    match !f with
-      | None -> raise Closed
-      | Some f -> audioproperties_get_int f.audioproperties s
+    let f = get_taglib_file f in
+    audioproperties_get_int (file_audioproperties f) s
 
   let audioproperties_length p = audioproperties_get_int p "length"
   let audioproperties_bitrate p = audioproperties_get_int p "bitrate"

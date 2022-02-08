@@ -1,5 +1,5 @@
 (lang dune 2.8)
-(version 0.3.8)
+(version 0.3.9)
 (name taglib)
 (source (github savonet/ocaml-taglib))
 (license "LGPL-2.1-only WITH OCaml-LGPL-linking-exception")

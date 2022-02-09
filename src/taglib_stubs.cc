@@ -184,8 +184,8 @@ static inline value value_of_taglib_file(value v, File *f) {
 // to be consistent here.
 static struct custom_operations tag_ops = {
     (char *)"ocaml_taglib_tag", custom_finalize_default,
-    custom_compare_default,           custom_hash_default,
-    custom_serialize_default,         custom_deserialize_default};
+    custom_compare_default,     custom_hash_default,
+    custom_serialize_default,   custom_deserialize_default};
 
 static inline value value_of_taglib_tag(value v, Tag *tag) {
   v = caml_alloc_custom(&tag_ops, sizeof(Tag *), 1, 0);

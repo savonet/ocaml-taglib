@@ -1,6 +1,6 @@
-0.3.9 (unreleased)
+0.3.9 (09-02-2022)
 =====
-* Cleanup logic around file properties and tag. (#11)
+* Fix segfault (#11)
 
 0.3.8 (04-01-2022)
 =====

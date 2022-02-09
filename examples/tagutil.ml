@@ -8,6 +8,7 @@ let args = [("-s", Arg.Set strip, "Switch to strip mode.")]
 let gen_tag () =
   let tag = Taglib.Inline.Id3v2.init () in
   let tag = Taglib.Inline.Id3v2.attach_frame tag "TSSE" "tagutil example" in
+  let tag = Taglib.Inline.Id3v2.tag_set_title tag "some title" in
   let read tag =
     Taglib.Inline.Id3v2.attach_frame tag (read_line ()) (read_line ())
   in

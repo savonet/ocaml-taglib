@@ -9,5 +9,6 @@ let () =
     prop;
   Hashtbl.replace prop "PUBLISHER" ["foobarlol"];
   Taglib.File.set_properties f prop;
+  Taglib.tag_set_title f "Some title";
   ignore (Taglib.File.file_save f);
   Taglib.File.close_file f

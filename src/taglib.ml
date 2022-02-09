@@ -119,11 +119,15 @@ module File = struct
     end;
     let f = open_file file_type name in
     let file = { taglib_file = Some f; file_type } in
-    ( file,
-      fun f ->
-        match f with
-          | { taglib_file = None; _ } -> raise Closed
-          | { taglib_file = Some f; _ } -> file_tag f )
+    let file =
+      ( file,
+        fun f ->
+          match f with
+            | { taglib_file = None; _ } -> raise Closed
+            | { taglib_file = Some f; _ } -> file_tag f )
+    in
+    Gc.finalise close_file file;
+    file
 
   external properties : taglib_file -> (string -> string -> unit) -> unit
     = "caml_taglib_file_get_properties"

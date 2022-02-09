@@ -90,13 +90,13 @@ using namespace TagLib;
 
 /* Declaring the functions which should be accessible on the C side. */
 extern "C" {
-#define CAML_INTERNALS
 #include <caml/alloc.h>
 #include <caml/callback.h>
 #include <caml/fail.h>
 #include <caml/memory.h>
 #include <caml/misc.h>
 #include <caml/signals.h>
+
 #ifdef WIN32
 #include <caml/osdeps.h>
 #endif
@@ -178,11 +178,18 @@ static inline value value_of_taglib_file(value v, File *f) {
   return v;
 }
 
-#define Taglib_tag_val(v) (*((Tag **)Data_abstract_val(v)))
+#define Taglib_tag_val(v) (*((Tag **)Data_custom_val(v)))
 
-static inline value value_of_taglib_tag(value v, Tag *f) {
-  v = caml_alloc(1, Abstract_tag);
-  *((Tag **)Data_abstract_val(v)) = f;
+// tag are implemented as custom val in the id3v2 case so we need
+// to be consistent here.
+static struct custom_operations tag_ops = {
+    (char *)"ocaml_taglib_tag", custom_finalize_default,
+    custom_compare_default,           custom_hash_default,
+    custom_serialize_default,         custom_deserialize_default};
+
+static inline value value_of_taglib_tag(value v, Tag *tag) {
+  v = caml_alloc_custom(&tag_ops, sizeof(Tag *), 1, 0);
+  Taglib_tag_val(v) = tag;
   return v;
 }
 

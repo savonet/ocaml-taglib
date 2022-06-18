@@ -90,6 +90,7 @@ using namespace TagLib;
 
 /* Declaring the functions which should be accessible on the C side. */
 extern "C" {
+#define CAML_INTERNALS
 #include <caml/alloc.h>
 #include <caml/callback.h>
 #include <caml/fail.h>

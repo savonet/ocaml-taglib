@@ -1,4 +1,9 @@
 (executable
+ (name read_tags)
+ (modules read_tags)
+ (libraries taglib))
+
+(executable
  (name properties)
  (modules properties)
  (libraries taglib))

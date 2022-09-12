@@ -54,6 +54,7 @@ module File = struct
     [ `Autodetect
     | `Mpeg
     | `OggVorbis
+    | `OggOpus
     | `Flac
     | `Mpc
     | `OggFlac
@@ -283,6 +284,7 @@ end
 type file_type =
   | Mpeg
   | OggVorbis
+  | OggOpus
   | Flac
   | Mpc
   | OggFlac
@@ -305,6 +307,7 @@ let open_file ?file_type f =
         match t with
           | Mpeg -> f `Mpeg
           | OggVorbis -> f `OggVorbis
+          | OggOpus -> f `OggOpus
           | Flac -> f `Flac
           | Mpc -> f `Mpc
           | OggFlac -> f `OggFlac

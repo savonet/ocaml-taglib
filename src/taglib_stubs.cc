@@ -54,6 +54,10 @@
 #include <oggflacfile.h>
 #include <vorbisfile.h>
 
+#ifdef HAS_OPUS
+#include <opusfile.h>
+#endif
+
 #ifdef HAS_MP4
 #include <mp4file.h>
 #endif
@@ -145,6 +149,7 @@ CAMLprim value caml_taglib_version(value unit) {
 decl_var(Autodetect);
 decl_var(Mpeg);
 decl_var(OggVorbis);
+decl_var(OggOpus);
 decl_var(Flac);
 decl_var(Mpc);
 decl_var(OggFlac);
@@ -160,6 +165,7 @@ CAMLprim value caml_taglib_init(value unit) {
   import_var(Autodetect);
   import_var(Mpeg);
   import_var(OggVorbis);
+  import_var(OggOpus);
   import_var(Flac);
   import_var(Mpc);
   import_var(OggFlac);
@@ -227,6 +233,10 @@ CAMLprim value caml_taglib_file_new(value type, value name) {
     f = new MPEG::File(filename);
   else if (type == get_var(OggVorbis))
     f = new Ogg::Vorbis::File(filename);
+#ifdef HAS_OPUS
+  else if (type == get_var(OggOpus))
+    f = new Ogg::Opus::File(filename);
+#endif
   else if (type == get_var(Flac))
     f = new FLAC::File(filename);
 #ifdef HAS_MPC

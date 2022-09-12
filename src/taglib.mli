@@ -76,11 +76,15 @@ module File : sig
     * [Speex] and [TrueAudio] are only supported in
     * Taglib >= 1.5.
     * Types: [Mp4], [Asf] are only supported with
-    * Taglib >= 1.6. *)
+    * Taglib >= 1.6.
+    * Type: [OggOpus] is only supported with
+    * Taglib >= 1.9 and does not seem to be supported
+    * in [`Autodetect] mode. *)
   type file_type =
     [ `Autodetect
     | `Mpeg
     | `OggVorbis
+    | `OggOpus
     | `Flac
     | `Mpc
     | `OggFlac
@@ -211,6 +215,7 @@ end
 type file_type =
   | Mpeg
   | OggVorbis
+  | OggOpus
   | Flac
   | Mpc
   | OggFlac

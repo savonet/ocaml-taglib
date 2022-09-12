@@ -48,6 +48,12 @@ let () =
           ~link_flags:conf.libs c
           (check_class_code "speexfile.h" "TagLib::Ogg::Speex::File")
       in
+      let has_opus =
+        C.c_test
+          ~c_flags:(["-x"; "c++"] @ conf.cflags)
+          ~link_flags:conf.libs c
+          (check_class_code "opusfile.h" "TagLib::Ogg::Opus::File")
+      in
       let has_mp4 =
         C.c_test
           ~c_flags:(["-x"; "c++"] @ conf.cflags)
@@ -72,6 +78,7 @@ let () =
           ("HAS_PROPERTIES", Switch has_properties);
           ("HAS_WAVPACK", Switch has_wavpack);
           ("HAS_SPEEX", Switch has_speex);
+          ("HAS_OPUS", Switch has_opus);
           ("HAS_MP4", Switch has_mp4);
           ("HAS_ASF", Switch has_asf);
           ("HAS_TRUEAUDIO", Switch has_trueaudio);

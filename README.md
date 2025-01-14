@@ -1,3 +1,9 @@
+# ⚠️ Deprecation Warning! ⚠️
+
+This package is not currently maintained. Please feel free to contact us if you wish to take it over!
+
+---
+
 ocaml-taglib
 ============
 
